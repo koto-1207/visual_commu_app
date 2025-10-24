@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('places', function (Blueprint $table) {
             $table->id();
+            $table->string('name');         // ★この行を追加
+            $table->string('image_path');
             $table->timestamps();
         });
     }
