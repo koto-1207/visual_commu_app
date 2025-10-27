@@ -9,3 +9,30 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+@import 'tailwindcss';
+
+/* ★ content設定（どのファイルをスキャンするか）- すでに設定済み！ */
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+/* ★ テーマのカスタマイズ */
+@theme {
+    /* フォント設定（既存） */
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* ★ カスタムカラーを追加 */
+    --color-pic-pink: #f7b2b7;
+    /* やさしいピンク */
+    --color-pic-mint: #a2d9ce;
+    /* やさしいミント */
+    --color-pic-bg: #fdf6f6;
+    /* やさしい背景色 */
+
+    /* ★ 角丸の設定を追加 */
+    --radius-xl: 1rem;
+    --radius-2xl: 1.5rem;
+}

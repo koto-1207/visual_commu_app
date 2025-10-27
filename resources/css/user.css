@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap');
+
 /* resources/css/user.css */
 
 /*
@@ -6,8 +8,9 @@
  * やわらかい背景色と文字設定を追加します。
  */
 body {
-    background-color: #fcfcfa;
-    font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Arial', 'Meiryo', sans-serif;
+    /* ★ ロゴのピンクを薄くした色に変更 */
+    background-color: #fdf6f6;
+    font-family: 'M PLUS Rounded 1c', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Arial', 'Meiryo', sans-serif;
     color: #4a4a4a;
 }
 
@@ -16,7 +19,8 @@ body {
  */
 .card {
     background-color: #ffffff;
-    border: 3px solid #a7c7e7;
+    /* ★ ロゴのミントグリーンを枠線に変更 */
+    border: 3px solid #a2d9ce;
     border-radius: 1.5rem;
     padding: 1.5rem;
     text-align: center;
@@ -107,7 +111,15 @@ body {
  * 選択されたカードのスタイル
  */
 .selected-card {
-    border-color: #e2e252;
-    box-shadow: 0 8px 20px rgba(253, 253, 150, 0.4);
-    transform: scale(1.10);
+    /* ★ ロゴのピンクを枠線に変更 */
+    border-color: #f7b2b7;
+    /* ★ 影の色もピンク系に */
+    box-shadow: 0 8px 20px rgba(247, 178, 183, 0.4);
+    transform: scale(1.08);
+}
+
+/* ★ プレビューエリアの枠線も変更 */
+.preview-highlight {
+    border-color: #f7b2b7;
+    /* ロゴのピンク */
 }

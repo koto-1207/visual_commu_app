@@ -96,8 +96,9 @@ $nextPlace = computed(function () {
         </div>
         <div class="w-32 h-32">
             @if ($this->currentPlace)
+                {{-- ★ border-blue-400 を preview-highlight に変更 --}}
                 <img src="{{ asset('storage/' . $this->currentPlace->image_path) }}"
-                    class="w-full h-full object-cover rounded-2xl border-4 border-blue-400 shadow-lg"
+                    class="w-full h-full object-cover rounded-2xl border-4 preview-highlight shadow-lg"
                     onerror="this.src='{{ asset('storage/places/placeholder.png') }}'; this.onerror=null;">
             @endif
         </div>
