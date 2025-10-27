@@ -14,8 +14,8 @@ state(['currentIndex' => 0]);
 // カードの総数
 state(['totalPlaces' => 0]);
 
-// 「選ばれた」カードのIDを保存する変数
-state(['selectedPlaceId' => null]);
+// 「選ばれた」カードのIDを保存する変数（ブラウザ側で管理するため削除）
+// state(['selectedPlaceId' => null]);
 
 // ページが読み込まれた時に、全カード情報を取得
 mount(function () {
@@ -27,7 +27,6 @@ mount(function () {
 $next = function () {
     if ($this->totalPlaces > 0) {
         $this->currentIndex = ($this->currentIndex + 1) % $this->totalPlaces;
-        $this->selectedPlaceId = null; // 次/前に移動したら選択状態をリセット
     }
 };
 
@@ -39,16 +38,15 @@ $prev = function () {
             $newIndex = $this->totalPlaces - 1; // 最後尾に移動
         }
         $this->currentIndex = $newIndex;
-        $this->selectedPlaceId = null; // 次/前に移動したら選択状態をリセット
     }
 };
 
-// カードがクリックされた時の処理
-$selectCurrentPlace = function () {
-    if ($this->currentPlace) {
-        $this->selectedPlaceId = $this->currentPlace->id;
-    }
-};
+// カードがクリックされた時の処理（JavaScript側で管理するため削除）
+// $selectCurrentPlace = function () {
+//     if ($this->currentPlace) {
+//         $this->selectedPlaceId = $this->currentPlace->id;
+//     }
+// };
 
 // 表示すべき「前の」カードを計算
 $prevPlace = computed(function () {
@@ -118,23 +116,19 @@ $nextPlace = computed(function () {
             <h1 class="text-3xl md:text-4xl font-bold text-gray-700 mb-6">
                 {{ $this->currentPlace->name }}
             </h1>
-            {{-- 大きなカード (wire:click を追加) --}}
+            {{-- 大きなカード (クリックで選択状態をトグル) --}}
             <div class="flex justify-center">
-                {{-- selectedPlaceId と currentPlace->id が一致したら 'selected-card' クラスを追加 --}}
-                <div wire:click="selectCurrentPlace" role="button" tabindex="0"
-                    aria-label="{{ $this->currentPlace->name }}を選択"
-                    aria-pressed="{{ $selectedPlaceId === $this->currentPlace->id ? 'true' : 'false' }}"
-                    class="card w-full max-w-lg cursor-pointer relative {{ $selectedPlaceId === $this->currentPlace->id ? 'selected-card' : '' }}"
-                    onkeypress="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }">
+                <div id="card-main" role="button" tabindex="0" aria-label="{{ $this->currentPlace->name }}を選択"
+                    aria-pressed="false" class="card w-full max-w-lg cursor-pointer relative"
+                    onclick="toggleCardSelection(this)"
+                    onkeypress="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleCardSelection(this); }">
 
                     <img src="{{ asset('storage/' . $this->currentPlace->image_path) }}"
                         alt="{{ $this->currentPlace->name }}" class="card-image h-80 md:h-96"
                         onerror="this.src='{{ asset('storage/places/placeholder.png') }}'; this.onerror=null;">
 
                     {{-- ★ 「選ばれた」時にキラキラエフェクトを表示する要素 --}}
-                    @if ($selectedPlaceId === $this->currentPlace->id)
-                        <div class="sparkle-effect"></div> {{-- ← チェックマークから変更 --}}
-                    @endif
+                    <div class="sparkle-effect" style="display: none;"></div>
                 </div>
             </div>
         @else
@@ -168,8 +162,37 @@ $nextPlace = computed(function () {
         </a>
     </div>
 
-    {{-- スワイプ用JavaScript --}}
+    {{-- カード選択とスワイプ用JavaScript --}}
     <script>
+        // カード選択状態をトグルする関数（サーバー通信なし、ブラウザ側のみで処理）
+        function toggleCardSelection(cardElement) {
+            const sparkleEffect = cardElement.querySelector('.sparkle-effect');
+            const isSelected = cardElement.classList.contains('selected-card');
+
+            if (isSelected) {
+                // 選択解除
+                cardElement.classList.remove('selected-card');
+                cardElement.setAttribute('aria-pressed', 'false');
+                if (sparkleEffect) sparkleEffect.style.display = 'none';
+            } else {
+                // 選択
+                cardElement.classList.add('selected-card');
+                cardElement.setAttribute('aria-pressed', 'true');
+                if (sparkleEffect) sparkleEffect.style.display = 'block';
+            }
+        }
+
+        // カードが変わったら選択状態をリセット
+        function resetCardSelection() {
+            const cardElement = document.getElementById('card-main');
+            if (cardElement) {
+                cardElement.classList.remove('selected-card');
+                cardElement.setAttribute('aria-pressed', 'false');
+                const sparkleEffect = cardElement.querySelector('.sparkle-effect');
+                if (sparkleEffect) sparkleEffect.style.display = 'none';
+            }
+        }
+
         document.addEventListener('livewire:navigated', () => {
             const swipeArea = document.getElementById('swipe-area');
             if (!swipeArea) return;
@@ -196,8 +219,31 @@ $nextPlace = computed(function () {
                 const horizontalDist = touchEndX - touchStartX;
                 const verticalDist = touchEndY - touchStartY;
                 if (Math.abs(verticalDist) > Math.abs(horizontalDist)) return;
-                if (horizontalDist < -swipeThreshold) @this.call('next');
-                if (horizontalDist > swipeThreshold) @this.call('prev');
+                if (horizontalDist < -swipeThreshold) {
+                    resetCardSelection(); // カード変更前に選択状態をリセット
+                    @this.call('next');
+                }
+                if (horizontalDist > swipeThreshold) {
+                    resetCardSelection(); // カード変更前に選択状態をリセット
+                    @this.call('prev');
+                }
+            }
+        });
+
+        // ボタンクリック時も選択状態をリセット
+        document.addEventListener('livewire:navigated', () => {
+            const prevBtn = document.querySelector('button[wire\\:click="prev"]');
+            const nextBtn = document.querySelector('button[wire\\:click="next"]');
+
+            if (prevBtn) {
+                prevBtn.addEventListener('click', () => {
+                    setTimeout(resetCardSelection, 100);
+                });
+            }
+            if (nextBtn) {
+                nextBtn.addEventListener('click', () => {
+                    setTimeout(resetCardSelection, 100);
+                });
             }
         });
     </script>

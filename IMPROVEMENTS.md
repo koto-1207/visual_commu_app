@@ -190,6 +190,86 @@ convert -size 600x400 -background "#f0f0f0" -fill "#666666" \
 
 ---
 
+---
+
+## 追加改善（2025/10/27 続き）
+
+### 9. カード選択時の黒い画面点滅の修正 ✅
+**場所**: `resources/views/livewire/choice/index.blade.php`
+
+**問題**: 
+カードをクリックするたびに画面が黒く点滅し、見づらかった。
+
+**原因**: 
+Livewireがサーバーと通信して全画面を再レンダリングしていたため。
+
+**解決方法**:
+選択状態をJavaScriptでブラウザ側だけで管理するように変更しました。
+
+```javascript
+// カード選択状態をトグルする関数（サーバー通信なし）
+function toggleCardSelection(cardElement) {
+    const isSelected = cardElement.classList.contains('selected-card');
+    
+    if (isSelected) {
+        // 選択解除
+        cardElement.classList.remove('selected-card');
+    } else {
+        // 選択
+        cardElement.classList.add('selected-card');
+    }
+}
+```
+
+**効果**: 
+- ✅ カードクリック時に画面が点滅しなくなりました
+- ✅ 選択・解除が即座に反応するようになりました
+- ✅ サーバー負荷が軽減されました
+- ✅ より快適な操作感になりました
+
+---
+
+### 10. 管理画面の画面点滅を最小化 ✅
+**場所**: `resources/views/livewire/places/index.blade.php`
+
+**問題**: 
+管理画面でも、予定追加・編集などの操作のたびに画面全体が黒く点滅していた。
+
+**原因**: 
+`wire:loading`が全ての操作に反応していたため。
+
+**解決方法**:
+
+1. **全画面オーバーレイを限定的に表示**
+   ```blade
+   {{-- 削除とクリア操作のみ全画面オーバーレイを表示 --}}
+   <div wire:loading.delay wire:target="delete,clearSchedule,updateSortOrder">
+   ```
+
+2. **個別ボタンにローディング表示を追加**
+   ```blade
+   {{-- ボタン内に「処理中...」を表示 --}}
+   <button wire:click="toggleSchedule({{ $place->id }})"
+       wire:loading.attr="disabled"
+       wire:target="toggleSchedule({{ $place->id }})">
+       <span wire:loading.remove>✅ 予定に追加</span>
+       <span wire:loading>処理中...</span>
+   </button>
+   ```
+
+**効果**: 
+- ✅ **予定追加/外す**: ボタン内だけが「処理中...」に変わる（画面点滅なし）
+- ✅ **編集ボタン**: 即座に編集画面に切り替わる（画面点滅なし）
+- ✅ **保存ボタン**: ボタン内だけが「保存中...」に変わる（画面点滅なし）
+- ✅ **削除**: 全画面オーバーレイ表示（データ削除は重要な操作のため）
+- ✅ **予定クリア**: 全画面オーバーレイ表示（データクリアは重要な操作のため）
+- ✅ 処理中のボタンは自動的に無効化され、二重実行を防止
+
+**wire:loading.delay とは？**
+一瞬で終わる操作ではローディング表示を出さず、時間がかかる操作だけローディング表示を出す機能です。より洗練されたUXになります。
+
+---
+
 ## まとめ
 
 今回の改善により、以下が実現されました：
@@ -200,6 +280,7 @@ convert -size 600x400 -background "#f0f0f0" -fill "#666666" \
 ✅ よりアクセシブルな操作（キーボード、スクリーンリーダー対応）
 ✅ より高速な表示（画像の遅延読み込み）
 ✅ よりメンテナンスしやすいコード（CSS整理）
+✅ より快適な操作感（画面点滅を最小化し、スムーズな操作を実現）
 
 アプリの基本的な動作や見た目は変わっていませんので、安心してお使いいただけます。
 

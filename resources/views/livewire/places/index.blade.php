@@ -129,10 +129,11 @@ $places = fn() => Place::latest()->get();
 
 ?>
 <div class="p-6">
-    {{-- 読み込み中のオーバーレイ --}}
-    <div wire:loading class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    {{-- 読み込み中のオーバーレイ（削除とクリア操作のみ表示） --}}
+    <div wire:loading.delay wire:target="delete,clearSchedule,updateSortOrder"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white p-6 rounded-xl shadow-lg">
-            <p class="text-xl font-bold text-gray-700">読み込み中...</p>
+            <p class="text-xl font-bold text-gray-700">処理中...</p>
         </div>
     </div>
 
@@ -183,9 +184,11 @@ $places = fn() => Place::latest()->get();
                         onerror="this.src='{{ asset('storage/places/placeholder.png') }}'; this.onerror=null;"
                         loading="lazy">
 
-                    <button wire:click="toggleSchedule({{ $place->id }})"
-                        class="px-3 py-1 bg-yellow-400 text-black rounded text-xs">
-                        ✅ 予定から外す
+                    <button wire:click="toggleSchedule({{ $place->id }})" wire:loading.attr="disabled"
+                        wire:target="toggleSchedule({{ $place->id }})"
+                        class="px-3 py-1 bg-yellow-400 text-black rounded text-xs disabled:opacity-50">
+                        <span wire:loading.remove wire:target="toggleSchedule({{ $place->id }})">✅ 予定から外す</span>
+                        <span wire:loading wire:target="toggleSchedule({{ $place->id }})">処理中...</span>
                     </button>
                 </div>
             @empty
@@ -218,7 +221,11 @@ $places = fn() => Place::latest()->get();
                     @error('editingPlaceName')
                         <span class="text-red-500 text-sm block mb-2">{{ $message }}</span>
                     @enderror
-                    <button wire:click="update" class="px-3 py-1 bg-blue-500 text-white rounded">保存</button>
+                    <button wire:click="update" wire:loading.attr="disabled" wire:target="update"
+                        class="px-3 py-1 bg-blue-500 text-white rounded disabled:opacity-50">
+                        <span wire:loading.remove wire:target="update">保存</span>
+                        <span wire:loading wire:target="update">保存中...</span>
+                    </button>
                     <button wire:click="cancelEdit" class="px-3 py-1 bg-gray-500 text-white rounded">キャンセル</button>
                 @else
                     {{-- 通常の表示 --}}
@@ -228,14 +235,21 @@ $places = fn() => Place::latest()->get();
                         onerror="this.src='{{ asset('storage/places/placeholder.png') }}'; this.onerror=null;"
                         loading="lazy">
                     <div class="flex flex-col gap-1">
-                        <button wire:click="toggleSchedule({{ $place->id }})"
-                            class="px-3 py-1 {{ $isOnSchedule ? 'bg-yellow-400 text-black' : 'bg-green-500 text-white' }} rounded text-sm">
-                            {{ $isOnSchedule ? '✅ 予定から外す' : '✅ 予定に追加' }}
+                        <button wire:click="toggleSchedule({{ $place->id }})" wire:loading.attr="disabled"
+                            wire:target="toggleSchedule({{ $place->id }})"
+                            class="px-3 py-1 {{ $isOnSchedule ? 'bg-yellow-400 text-black' : 'bg-green-500 text-white' }} rounded text-sm disabled:opacity-50">
+                            <span wire:loading.remove
+                                wire:target="toggleSchedule({{ $place->id }})">{{ $isOnSchedule ? '✅ 予定から外す' : '✅ 予定に追加' }}</span>
+                            <span wire:loading wire:target="toggleSchedule({{ $place->id }})">処理中...</span>
                         </button>
                         <button wire:click="edit({{ $place->id }})"
                             class="px-3 py-1 bg-gray-300 text-black rounded text-sm">編集</button>
                         <button wire:click="delete({{ $place->id }})" wire:confirm="本当に削除しますか？"
-                            class="px-3 py-1 bg-red-500 text-white rounded text-sm">削除</button>
+                            wire:loading.attr="disabled" wire:target="delete({{ $place->id }})"
+                            class="px-3 py-1 bg-red-500 text-white rounded text-sm disabled:opacity-50">
+                            <span wire:loading.remove wire:target="delete({{ $place->id }})">削除</span>
+                            <span wire:loading wire:target="delete({{ $place->id }})">削除中...</span>
+                        </button>
                     </div>
                 @endif
             </div>
