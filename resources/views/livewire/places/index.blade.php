@@ -3,11 +3,13 @@
 use function Livewire\Volt\{state, on, mount};
 use App\Models\Place;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Collection;
 
 // 編集中のカードIDと新しい名前を保存する変数を準備
 state(['editingPlaceId' => null]);
 state(['editingPlaceName' => '']);
+state(['editingPlaceImage' => '']);
 
 // 今日の予定リスト用の変数
 state(['scheduledIds' => []]);
@@ -76,6 +78,11 @@ $clearSchedule = function () {
 
 // 削除ボタンが押された時の処理
 $delete = function (Place $place) {
+    // 画像ファイルを削除
+    if ($place->image_path && Storage::disk('public')->exists($place->image_path)) {
+        Storage::disk('public')->delete($place->image_path);
+    }
+
     $place->delete();
     // セッションからも削除（もしあれば）
     $index = array_search($place->id, $this->scheduledIds);
@@ -92,6 +99,7 @@ $delete = function (Place $place) {
 $edit = function (Place $place) {
     $this->editingPlaceId = $place->id;
     $this->editingPlaceName = $place->name;
+    $this->editingPlaceImage = $place->image_path;
 };
 
 // 編集中の保存ボタンが押された時の処理
@@ -113,7 +121,7 @@ $update = function () {
 
 // 編集中のキャンセルボタンが押された時の処理
 $cancelEdit = function () {
-    $this->reset('editingPlaceId', 'editingPlaceName');
+    $this->reset('editingPlaceId', 'editingPlaceName', 'editingPlaceImage');
 };
 
 // データベースから「すべての」場所のリストを取得する
@@ -121,6 +129,13 @@ $places = fn() => Place::latest()->get();
 
 ?>
 <div class="p-6">
+    {{-- 読み込み中のオーバーレイ --}}
+    <div wire:loading class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-xl shadow-lg">
+            <p class="text-xl font-bold text-gray-700">読み込み中...</p>
+        </div>
+    </div>
+
     {{-- 管理者用ナビゲーション --}}
     <div class="mb-5 p-4 bg-gray-100 rounded-lg flex justify-between items-center">
         <h2 class="text-xl font-bold text-gray-700">管理メニュー</h2>
@@ -164,7 +179,9 @@ $places = fn() => Place::latest()->get();
 
                     <p class="text-md font-bold text-gray-700">{{ $place->name }}</p>
                     <img src="{{ asset('storage/' . $place->image_path) }}" alt="{{ $place->name }}"
-                        class="w-40 h-28 object-cover rounded my-2">
+                        class="w-40 h-28 object-cover rounded my-2"
+                        onerror="this.src='{{ asset('storage/places/placeholder.png') }}'; this.onerror=null;"
+                        loading="lazy">
 
                     <button wire:click="toggleSchedule({{ $place->id }})"
                         class="px-3 py-1 bg-yellow-400 text-black rounded text-xs">
@@ -189,6 +206,12 @@ $places = fn() => Place::latest()->get();
                 class="border-4 {{ $isOnSchedule ? 'border-green-500' : 'border-gray-300' }} p-3 rounded-lg text-center bg-white shadow">
                 @if ($editingPlaceId === $place->id)
                     {{-- 編集中の表示 --}}
+                    @if ($editingPlaceImage)
+                        <img src="{{ asset('storage/' . $editingPlaceImage) }}" alt="{{ $editingPlaceName }}"
+                            class="w-52 h-36 object-cover rounded my-2"
+                            onerror="this.src='{{ asset('storage/places/placeholder.png') }}'; this.onerror=null;"
+                            loading="lazy">
+                    @endif
                     <input type="text" wire:model="editingPlaceName"
                         class="w-full p-2 border border-gray-300 rounded mb-2">
                     {{-- エラー表示は name 属性ではなく $editingPlaceName を参照 --}}
@@ -201,7 +224,9 @@ $places = fn() => Place::latest()->get();
                     {{-- 通常の表示 --}}
                     <p class="text-lg font-bold text-gray-700">{{ $place->name }}</p>
                     <img src="{{ asset('storage/' . $place->image_path) }}" alt="{{ $place->name }}"
-                        class="w-52 h-36 object-cover rounded my-2">
+                        class="w-52 h-36 object-cover rounded my-2"
+                        onerror="this.src='{{ asset('storage/places/placeholder.png') }}'; this.onerror=null;"
+                        loading="lazy">
                     <div class="flex flex-col gap-1">
                         <button wire:click="toggleSchedule({{ $place->id }})"
                             class="px-3 py-1 {{ $isOnSchedule ? 'bg-yellow-400 text-black' : 'bg-green-500 text-white' }} rounded text-sm">

@@ -92,19 +92,22 @@ $nextPlace = computed(function () {
         <div class="w-24 h-24">
             @if ($this->prevPlace)
                 <img src="{{ asset('storage/' . $this->prevPlace->image_path) }}"
-                    class="w-full h-full object-cover rounded-lg opacity-50">
+                    class="w-full h-full object-cover rounded-lg opacity-50"
+                    onerror="this.src='{{ asset('storage/places/placeholder.png') }}'; this.onerror=null;">
             @endif
         </div>
         <div class="w-32 h-32">
             @if ($this->currentPlace)
                 <img src="{{ asset('storage/' . $this->currentPlace->image_path) }}"
-                    class="w-full h-full object-cover rounded-2xl border-4 border-blue-400 shadow-lg">
+                    class="w-full h-full object-cover rounded-2xl border-4 border-blue-400 shadow-lg"
+                    onerror="this.src='{{ asset('storage/places/placeholder.png') }}'; this.onerror=null;">
             @endif
         </div>
         <div class="w-24 h-24">
             @if ($this->nextPlace)
                 <img src="{{ asset('storage/' . $this->nextPlace->image_path) }}"
-                    class="w-full h-full object-cover rounded-lg opacity-50">
+                    class="w-full h-full object-cover rounded-lg opacity-50"
+                    onerror="this.src='{{ asset('storage/places/placeholder.png') }}'; this.onerror=null;">
             @endif
         </div>
     </div>
@@ -118,11 +121,15 @@ $nextPlace = computed(function () {
             {{-- 大きなカード (wire:click を追加) --}}
             <div class="flex justify-center">
                 {{-- selectedPlaceId と currentPlace->id が一致したら 'selected-card' クラスを追加 --}}
-                <div wire:click="selectCurrentPlace"
-                    class="card w-full max-w-lg cursor-pointer relative {{ $selectedPlaceId === $this->currentPlace->id ? 'selected-card' : '' }}">
+                <div wire:click="selectCurrentPlace" role="button" tabindex="0"
+                    aria-label="{{ $this->currentPlace->name }}を選択"
+                    aria-pressed="{{ $selectedPlaceId === $this->currentPlace->id ? 'true' : 'false' }}"
+                    class="card w-full max-w-lg cursor-pointer relative {{ $selectedPlaceId === $this->currentPlace->id ? 'selected-card' : '' }}"
+                    onkeypress="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }">
 
                     <img src="{{ asset('storage/' . $this->currentPlace->image_path) }}"
-                        alt="{{ $this->currentPlace->name }}" class="card-image h-80 md:h-96">
+                        alt="{{ $this->currentPlace->name }}" class="card-image h-80 md:h-96"
+                        onerror="this.src='{{ asset('storage/places/placeholder.png') }}'; this.onerror=null;">
 
                     {{-- ★ 「選ばれた」時にキラキラエフェクトを表示する要素 --}}
                     @if ($selectedPlaceId === $this->currentPlace->id)
@@ -133,18 +140,22 @@ $nextPlace = computed(function () {
         @else
             {{-- カードがない場合の表示 --}}
             <h1 class="text-3xl md:text-4xl font-bold text-gray-700 mb-6">カードがありません</h1>
-            <p class="text-xl text-gray-500">まず管理画面からカードを登録してください。</p>
+            <p class="text-xl text-gray-500 mb-6">まず管理画面からカードを登録してください。</p>
+            <a href="/places" wire:navigate
+                class="inline-block px-8 py-4 bg-blue-500 text-white rounded-2xl text-xl font-bold hover:bg-blue-600 transition shadow-lg">
+                管理画面へ
+            </a>
         @endif
     </div>
 
     {{-- 3. 操作ボタンのエリア (常時表示) --}}
     <div class="choice-buttons w-full max-w-lg flex justify-between mt-8">
-        <button wire:click="prev" {{ $this->totalPlaces < 2 ? 'disabled' : '' }}
-            class="inline-block px-10 py-5 bg-blue-200 text-gray-700 rounded-2xl text-4xl font-bold hover:bg-blue-300 transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+        <button wire:click="prev" {{ $this->totalPlaces < 2 ? 'disabled' : '' }} aria-label="前のカード"
+            class="inline-block px-10 py-5 bg-blue-200 text-gray-700 rounded-2xl text-4xl font-bold hover:bg-blue-300 transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed min-h-[48px] min-w-[48px]">
             &lt;
         </button>
-        <button wire:click="next" {{ $this->totalPlaces < 2 ? 'disabled' : '' }}
-            class="inline-block px-10 py-5 bg-green-200 text-gray-700 rounded-2xl text-4xl font-bold hover:bg-green-300 transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+        <button wire:click="next" {{ $this->totalPlaces < 2 ? 'disabled' : '' }} aria-label="次のカード"
+            class="inline-block px-10 py-5 bg-green-200 text-gray-700 rounded-2xl text-4xl font-bold hover:bg-green-300 transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed min-h-[48px] min-w-[48px]">
             &gt;
         </button>
     </div>
