@@ -6,9 +6,12 @@
  * やわらかい背景色と文字設定を追加します。
  */
 body {
-    background-color: #fcfcfa; /* 真っ白ではない、やさしいクリーム色の背景 */
-    font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Arial', 'Meiryo', sans-serif; /* 見やすいゴシック体 */
-    color: #4a4a4a; /* 真っ黒ではない、やわらかい文字色 */
+    background-color: #fcfcfa;
+    /* 真っ白ではない、やさしいクリーム色の背景 */
+    font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Arial', 'Meiryo', sans-serif;
+    /* 見やすいゴシック体 */
+    color: #4a4a4a;
+    /* 真っ黒ではない、やわらかい文字色 */
 }
 
 /*
@@ -16,32 +19,137 @@ body {
  * この .card クラスを、あとでHTML側で使います。
  */
 .card {
-    background-color: #ffffff;             /* カードの背景は白 */
-    border: 3px solid #a7c7e7;         /* 枠線はパステルブルー */
-    border-radius: 1.5rem;             /* 角をとても丸くする (rounded-2xl) */
-    padding: 1.5rem;                   /* カードの内側の余白をたっぷりとる */
-    text-align: center;                /* 文字を中央揃えに */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* やわらかい影をつける */
-    transition: all 0.2s ease-in-out;  /* アニメーションを滑らかに */
+    background-color: #ffffff;
+    /* カードの背景は白 */
+    border: 3px solid #a7c7e7;
+    /* 枠線はパステルブルー */
+    border-radius: 1.5rem;
+    /* 角をとても丸くする (rounded-2xl) */
+    padding: 1.5rem;
+    /* カードの内側の余白をたっぷりとる */
+    text-align: center;
+    /* 文字を中央揃えに */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    /* やわらかい影をつける */
+    transition: all 0.2s ease-in-out;
+    /* アニメーションを滑らかに */
 }
 
 /*
  * カード内の画像の基本デザイン
  */
 .card-image {
-    width: 100%;                       /* 横幅いっぱいに */
-    height: 220px;                     /* 高さを固定（好みで調整してください） */
-    object-fit: cover;                 /* 画像が引き伸ばされないように、中央で切り取る */
-    border-radius: 1rem;               /* 画像の角も丸くする (rounded-xl) */
-    margin-bottom: 1rem;               /* 画像と文字の間に余白 */
+    width: 100%;
+    /* 横幅いっぱいに */
+    height: 220px;
+    /* 高さを固定（好みで調整してください） */
+    object-fit: cover;
+    /* 画像が引き伸ばされないように、中央で切り取る */
+    border-radius: 1rem;
+    /* 画像の角も丸くする (rounded-xl) */
+    margin-bottom: 1rem;
+    /* 画像と文字の間に余白 */
 }
 
 /*
  * カード内の文字の基本デザイン
  */
 .card-title {
-    font-size: 2.25rem;                /* 文字をとても大きく (text-4xl) */
-    font-weight: bold;                 /* 太字に */
-    color: #333;                      /* 少し濃いめのグレー */
-    word-wrap: break-word;             /* 長い名前でも折り返す */
+    font-size: 2.25rem;
+    /* 文字をとても大きく (text-4xl) */
+    font-weight: bold;
+    /* 太字に */
+    color: #333;
+    /* 少し濃いめのグレー */
+    word-wrap: break-word;
+    /* 長い名前でも折り返す */
+}
+
+/* resources/css/user.css */
+
+/* ... (既存の .card などの定義) ... */
+
+/*
+ * 「選択された」カードの特別なスタイル
+ */
+@keyframes sparkle {
+    0% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+}
+
+/*
+ * キラキラエフェクト要素のスタイル
+ */
+.sparkle-effect {
+    position: absolute;
+    /* カード(relative)の左上を基準にする */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    /* 下の画像をクリックできるようにする */
+    overflow: hidden;
+    /* はみ出したキラキラは見えなくする */
+    border-radius: 1.5rem;
+    /* カードの角丸に合わせる */
+}
+
+/*
+ * キラキラの粒を複数生成 (::before と ::after を使う)
+ * 数や位置、色、アニメーションの遅延を変えることで、
+ * より複雑なキラキラに見せます。
+ */
+.sparkle-effect::before,
+.sparkle-effect::after {
+    content: '✨';
+    /* キラキラの絵文字を使う（画像や点でもOK） */
+    position: absolute;
+    font-size: 2rem;
+    /* キラキラの大きさ */
+    opacity: 0;
+    animation: sparkle 1s ease-in-out infinite;
+    /* sparkleアニメーションを無限ループ */
+}
+
+/* 1つ目のキラキラ（左上あたり） */
+.sparkle-effect::before {
+    top: 15%;
+    left: 15%;
+    animation-delay: 0s;
+    /* すぐ開始 */
+}
+
+/* 2つ目のキラキラ（右下あたり） */
+.sparkle-effect::after {
+    bottom: 15%;
+    right: 15%;
+    animation-delay: 0.3s;
+    /* 少し遅れて開始 */
+}
+
+
+
+/*
+ * 選択されたカード自体のスタイルも少し調整
+ * (キラキラが目立つように、枠線の色などを調整)
+ */
+.selected-card {
+    border-color: #e2e252;
+
+    box-shadow: 0 8px 20px rgba(253, 253, 150, 0.4);
+    /* 黄色っぽい影 */
+    transform: scale(1.10);
 }
