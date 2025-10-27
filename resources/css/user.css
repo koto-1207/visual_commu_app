@@ -1,0 +1,47 @@
+/* resources/css/user.css */
+
+/*
+ * アプリ全体の基本設定
+ * Tailwindの便利なリセットCSS（preflight）に、
+ * やわらかい背景色と文字設定を追加します。
+ */
+body {
+    background-color: #fcfcfa; /* 真っ白ではない、やさしいクリーム色の背景 */
+    font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Arial', 'Meiryo', sans-serif; /* 見やすいゴシック体 */
+    color: #4a4a4a; /* 真っ黒ではない、やわらかい文字色 */
+}
+
+/*
+ * 利用者画面の「カード」の基本デザイン
+ * この .card クラスを、あとでHTML側で使います。
+ */
+.card {
+    background-color: #ffffff;             /* カードの背景は白 */
+    border: 3px solid #a7c7e7;         /* 枠線はパステルブルー */
+    border-radius: 1.5rem;             /* 角をとても丸くする (rounded-2xl) */
+    padding: 1.5rem;                   /* カードの内側の余白をたっぷりとる */
+    text-align: center;                /* 文字を中央揃えに */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* やわらかい影をつける */
+    transition: all 0.2s ease-in-out;  /* アニメーションを滑らかに */
+}
+
+/*
+ * カード内の画像の基本デザイン
+ */
+.card-image {
+    width: 100%;                       /* 横幅いっぱいに */
+    height: 220px;                     /* 高さを固定（好みで調整してください） */
+    object-fit: cover;                 /* 画像が引き伸ばされないように、中央で切り取る */
+    border-radius: 1rem;               /* 画像の角も丸くする (rounded-xl) */
+    margin-bottom: 1rem;               /* 画像と文字の間に余白 */
+}
+
+/*
+ * カード内の文字の基本デザイン
+ */
+.card-title {
+    font-size: 2.25rem;                /* 文字をとても大きく (text-4xl) */
+    font-weight: bold;                 /* 太字に */
+    color: #333;                      /* 少し濃いめのグレー */
+    word-wrap: break-word;             /* 長い名前でも折り返す */
+}

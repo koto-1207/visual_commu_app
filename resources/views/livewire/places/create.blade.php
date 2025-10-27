@@ -22,45 +22,44 @@ $save = function () {
         'image_path' => $path,
     ]);
 
-    // ★ 登録が成功したら、一覧ページ（/places）へ移動する
+    // 登録成功したら一覧ページへ移動
     return $this->redirect('/places', navigate: true);
 };
 
 ?>
-
-<div>
-    <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-        <h2>新しい場所を登録</h2>
-        <a href="/places" wire:navigate
-            style="display: inline-block; padding: 10px 15px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 5px;">
+<div class="p-6">
+    <div class="mb-5 flex justify-between items-center">
+        <h2 class="text-2xl font-bold text-gray-700">新しい場所を登録</h2>
+        <a href="/places" wire:navigate class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
             一覧に戻る
         </a>
     </div>
 
-    <form wire:submit="save" style="border: 1px solid #ccc; padding: 15px; border-radius: 8px;">
-        <div style="margin-bottom: 10px;">
-            <label for="name">場所の名前:</label><br>
-            <input type="text" id="name" wire:model="name" style="width: 100%; padding: 8px;">
+    <form wire:submit="save" class="p-4 border border-gray-300 rounded-lg bg-white shadow">
+        <div class="mb-4">
+            <label for="name" class="block text-lg font-medium text-gray-700">場所の名前:</label>
+            <input type="text" id="name" wire:model="name"
+                class="w-full p-2 border border-gray-300 rounded mt-1">
             @error('name')
-                <span style="color: red;">{{ $message }}</span>
+                <span class="text-red-500 text-sm">{{ $message }}</span>
             @enderror
         </div>
 
-        <div style="margin-bottom: 10px;">
-            <label for="photo">写真:</label><br>
-            <input type="file" id="photo" wire:model="photo">
+        <div class="mb-4">
+            <label for="photo" class="block text-lg font-medium text-gray-700">写真:</label>
+            <input type="file" id="photo" wire:model="photo" class="w-full mt-1">
             @error('photo')
-                <span style="color: red;">{{ $message }}</span>
+                <span class="text-red-500 text-sm">{{ $message }}</span>
             @enderror
         </div>
 
         @if ($photo)
-            <div style="margin-bottom: 10px;">
-                <p>プレビュー:</p>
-                <img src="{{ $photo->temporaryUrl() }}" style="width: 200px; border: 1px solid #ddd;">
+            <div class="mb-4">
+                <p class="text-md font-medium text-gray-700">プレビュー:</p>
+                <img src="{{ $photo->temporaryUrl() }}" class="w-48 border border-gray-300 rounded">
             </div>
         @endif
 
-        <button type="submit">登録する</button>
+        <button type="submit" class="px-5 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">登録する</button>
     </form>
 </div>
