@@ -9,7 +9,7 @@
  */
 body {
     /* ★ ロゴのピンクを薄くした色に変更 */
-    background-color: #fdf6f6;
+    background-color: #f2faf9;
     font-family: 'M PLUS Rounded 1c', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Arial', 'Meiryo', sans-serif;
     color: #4a4a4a;
 }
@@ -123,3 +123,42 @@ body {
     border-color: #f7b2b7;
     /* ロゴのピンク */
 }
+
+
+@keyframes float {
+    0% {
+        transform: translate(0px, 0px);
+    }
+
+    25% {
+        transform: translate(15px, -20px);
+        /* ★ 右上に大きく移動 */
+    }
+
+    50% {
+        transform: translate(0px, -25px);
+        /* ★ 真上に大きく移動 */
+    }
+
+    75% {
+        transform: translate(-15px, -20px);
+        /* ★ 左上に大きく移動 */
+    }
+
+    100% {
+        transform: translate(0px, 0px);
+    }
+}
+
+/* アニメーションを適用するクラス */
+.animate-float {
+    animation: float 5s ease-in-out infinite;
+    /* ★ 5秒で1往復に */
+}
+
+/* 遅延クラス (変更なし) */
+.delay-1 {
+    animation-delay: 0.5s;
+}
+
+/* ... (残りのCSS) ... */

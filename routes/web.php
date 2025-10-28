@@ -3,19 +3,25 @@
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
-// 一覧表示ページの住所は '/places' にします
+// ★ 1. トップページ（ウェルカム画面）
+Volt::route('/', 'welcome'); // ★ '/' に welcome を割り当て
+
+// ★ 2. ログインフォーム画面
+Volt::route('/login', 'auth.login')->name('login'); // ★ '/login' はそのまま
+
+// 3. 管理画面（一覧）
 Volt::route('/places', 'places.index');
 
-// 登録ページの住所は '/places/create' です
+// 4. 管理画面（新規登録）
 Volt::route('/places/create', 'places.create');
 
-// 利用者用のスケジュール表示ページ
+// 5. 利用者画面（スケジュール）
 Volt::route('/schedule', 'schedule.index');
 
-// 利用者用の選択ページ（例：/choice/1/2 のようにアクセスする）
+// 6. 利用者画面（選択スライドショー）
 Volt::route('/choice', 'choice.index');
 
-// トップページ('/')にアクセスが来たら、一覧ページ('/places')に移動させます
-Route::get('/', function () {
-    return redirect('/places');
-});
+// ★ トップページ -> 管理画面へのリダイレクトは削除 (コメントアウトまたは削除)
+// Route::get('/', function () {
+//     return redirect('/places');
+// });
