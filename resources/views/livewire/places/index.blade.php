@@ -6,130 +6,109 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Collection;
 
-// 編集中のカードIDと新しい名前を保存する変数を準備
+// 編集中のカード情報
 state(['editingPlaceId' => null]);
 state(['editingPlaceName' => '']);
 state(['editingPlaceImage' => '']);
 
-// 今日の予定リスト用の変数
+// 予定リスト管理
 state(['scheduledIds' => []]);
-
-// 並び替え用の、予定リストに入ったカードコレクション
 state(['scheduledPlaces' => null]);
 
-// ページ読み込み時に、セッションから予定リストを読み込む
+// 初期化処理
 mount(function () {
     $this->scheduledIds = session('schedule_list', []);
-    $this->updateScheduledPlaces(); // 関数呼び出しに変更
+    $this->updateScheduledPlaces();
 });
 
-// 並び替えが完了したときに呼ばれる関数
+// 予定リストの並び替え処理
 $updateSortOrder = function ($items) {
-    // $items には並び替え後のIDの順番がキー/バリューで入ってくる
-    // IDだけを順番通りに抽出
     $this->scheduledIds = array_column($items, 'value');
-    // セッションに保存
     session(['schedule_list' => $this->scheduledIds]);
-    // 画面上のリストも更新
     $this->updateScheduledPlaces();
 };
 
-// 予定リストのカード情報を更新する補助関数
+// 予定リストの更新処理
 $updateScheduledPlaces = function () {
     if (empty($this->scheduledIds)) {
-        $this->scheduledPlaces = collect(); // 空のコレクション
+        $this->scheduledPlaces = collect();
         return;
     }
-    // DBからIDリストにあるカードを取得
     $placesCollection = Place::whereIn('id', $this->scheduledIds)->get();
-    // セッションのID順に並び替える
     $this->scheduledPlaces = $placesCollection
         ->sortBy(function ($place) {
             return array_search($place->id, $this->scheduledIds);
         })
-        ->values(); // キーを0から振り直す
+        ->values();
 };
 
-// 予定リストに追加/削除する処理
+// 予定リストの追加・削除
 $toggleSchedule = function ($id) {
     $index = array_search($id, $this->scheduledIds);
-
     if ($index !== false) {
         unset($this->scheduledIds[$index]);
     } else {
         $this->scheduledIds[] = $id;
     }
-
     $this->scheduledIds = array_values($this->scheduledIds);
     session(['schedule_list' => $this->scheduledIds]);
-
-    // 画面上のリストも更新
     $this->updateScheduledPlaces();
 };
 
-// 予定リストを空にする処理
+// 予定リストのクリア
 $clearSchedule = function () {
     $this->scheduledIds = [];
     session(['schedule_list' => []]);
-
-    // 画面上のリストも更新
     $this->updateScheduledPlaces();
 };
 
-// 削除ボタンが押された時の処理
+// カードの削除
 $delete = function (Place $place) {
-    // 画像ファイルを削除
     if ($place->image_path && Storage::disk('public')->exists($place->image_path)) {
         Storage::disk('public')->delete($place->image_path);
     }
-
     $place->delete();
-    // セッションからも削除（もしあれば）
+
     $index = array_search($place->id, $this->scheduledIds);
     if ($index !== false) {
         unset($this->scheduledIds[$index]);
         $this->scheduledIds = array_values($this->scheduledIds);
         session(['schedule_list' => $this->scheduledIds]);
-        $this->updateScheduledPlaces(); // リスト更新
+        $this->updateScheduledPlaces();
     }
-    $this->dispatch('$refresh'); // 全カードリスト更新
+    $this->dispatch('$refresh');
 };
 
-// 編集ボタンが押された時の処理
+// カードの編集開始
 $edit = function (Place $place) {
     $this->editingPlaceId = $place->id;
     $this->editingPlaceName = $place->name;
     $this->editingPlaceImage = $place->image_path;
 };
 
-// 編集中の保存ボタンが押された時の処理
+// カードの更新保存
 $update = function () {
-    // バリデーションルールを、この場所で直接定義
     $validatedData = $this->validate([
         'editingPlaceName' => 'required|string|max:255',
     ]);
-
     $place = Place::find($this->editingPlaceId);
-    $place->update([
-        'name' => $validatedData['editingPlaceName'],
-    ]);
-
+    $place->update(['name' => $validatedData['editingPlaceName']]);
     $this->cancelEdit();
-    $this->updateScheduledPlaces(); // 予定リストも更新される可能性があるため
-    $this->dispatch('$refresh'); // 全カードリスト更新
+    $this->updateScheduledPlaces();
+    $this->dispatch('$refresh');
 };
 
-// 編集中のキャンセルボタンが押された時の処理
+// 編集のキャンセル
 $cancelEdit = function () {
     $this->reset('editingPlaceId', 'editingPlaceName', 'editingPlaceImage');
 };
 
-// データベースから「すべての」場所のリストを取得する
+// 全カード取得
 $places = fn() => Place::latest()->get();
 
 ?>
 <div class="p-6">
-    {{-- 読み込み中のオーバーレイ（削除とクリア操作のみ表示） --}}
+    {{-- 処理中オーバーレイ --}}
     <div wire:loading.delay wire:target="delete,clearSchedule,updateSortOrder"
         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white p-6 rounded-xl shadow-lg">
@@ -137,7 +116,7 @@ $places = fn() => Place::latest()->get();
         </div>
     </div>
 
-    {{-- 管理者用ナビゲーション --}}
+    {{-- ヘッダーメニュー --}}
     <div class="mb-5 p-4 bg-gray-100 rounded-lg flex justify-between items-center">
         <h2 class="text-xl font-bold text-gray-700">管理メニュー</h2>
 
@@ -160,7 +139,7 @@ $places = fn() => Place::latest()->get();
         </div>
     </div>
 
-    {{-- 今日の予定リスト (並び替え可能エリア) --}}
+    {{-- 今日の予定リスト --}}
     <div class="mb-8">
         <h2 class="text-lg font-semibold text-gray-800 mb-3">今日の予定（ドラッグで並び替え）</h2>
 
@@ -197,7 +176,7 @@ $places = fn() => Place::latest()->get();
         </div>
     </div>
 
-    {{-- カード一覧表示 --}}
+    {{-- 全カード一覧 --}}
     <h2 class="text-lg font-semibold text-gray-800 mb-3">登録された場所（全カード）</h2>
     <div class="flex flex-wrap gap-4">
         @foreach ($this->places() as $place)
@@ -208,7 +187,7 @@ $places = fn() => Place::latest()->get();
             <div
                 class="border-4 {{ $isOnSchedule ? 'border-green-500' : 'border-gray-300' }} p-3 rounded-lg text-center bg-white shadow">
                 @if ($editingPlaceId === $place->id)
-                    {{-- 編集中の表示 --}}
+                    {{-- 編集モード --}}
                     @if ($editingPlaceImage)
                         <img src="{{ asset('storage/' . $editingPlaceImage) }}" alt="{{ $editingPlaceName }}"
                             class="w-52 h-36 object-cover rounded my-2"
@@ -217,7 +196,6 @@ $places = fn() => Place::latest()->get();
                     @endif
                     <input type="text" wire:model="editingPlaceName"
                         class="w-full p-2 border border-gray-300 rounded mb-2">
-                    {{-- エラー表示は name 属性ではなく $editingPlaceName を参照 --}}
                     @error('editingPlaceName')
                         <span class="text-red-500 text-sm block mb-2">{{ $message }}</span>
                     @enderror
@@ -228,7 +206,7 @@ $places = fn() => Place::latest()->get();
                     </button>
                     <button wire:click="cancelEdit" class="px-3 py-1 bg-gray-500 text-white rounded">キャンセル</button>
                 @else
-                    {{-- 通常の表示 --}}
+                    {{-- 通常モード --}}
                     <p class="text-lg font-bold text-gray-700">{{ $place->name }}</p>
                     <img src="{{ asset('storage/' . $place->image_path) }}" alt="{{ $place->name }}"
                         class="w-52 h-36 object-cover rounded my-2"
