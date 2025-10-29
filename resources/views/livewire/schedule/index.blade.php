@@ -18,7 +18,9 @@ mount(function () {
     $this->scheduledIds = session('schedule_list', []);
     $this->totalScheduled = count($this->scheduledIds);
     if ($this->totalScheduled > 0) {
-        $placesCollection = Place::whereIn('id', $this->scheduledIds)->get();
+        $placesCollection = Place::where('user_id', auth()->id())
+            ->whereIn('id', $this->scheduledIds)
+            ->get();
         $this->scheduledPlaces = $placesCollection
             ->sortBy(function ($place) {
                 return array_search($place->id, $this->scheduledIds);
@@ -62,7 +64,7 @@ $currentScheduledPlace = computed(function () {
     </div>
 
     {{-- カード表示エリア --}}
-    <div id="swipe-area-schedule" class="w-full text-center flex-grow flex flex-col justify-center">
+    <div id="swipe-area" class="w-full text-center">
         @if ($this->currentScheduledPlace)
             <h2 class="text-3xl md:text-4xl font-bold text-gray-700 mb-6">
                 {{ $this->currentScheduledPlace->name }}

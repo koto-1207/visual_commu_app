@@ -13,7 +13,9 @@ state(['totalPlaces' => 0]);
 
 // 初期化処理
 mount(function () {
-    $this->allPlaces = Place::latest()->get();
+    $this->allPlaces = Place::where('user_id', auth()->id())
+        ->latest()
+        ->get();
     $this->totalPlaces = $this->allPlaces->count();
 });
 
@@ -67,23 +69,31 @@ $nextPlace = computed(function () {
 ?>
 <div class="p-5 md:p-8 flex flex-col items-center justify-between min-h-[90vh]">
 
+    {{-- ヘッダー --}}
+    <div class="w-full max-w-lg mb-4 flex justify-between items-center pb-4 border-b border-gray-200">
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-700">きょうのよてい</h1>
+        <a href="/places" wire:navigate
+            class="inline-block px-2 py-1 bg-gray-400 text-white rounded text-xs hover:bg-gray-500 transition duration-150 opacity-75 hover:opacity-100">
+            メニュー
+        </a>
+    </div>
     {{-- プレビューエリア --}}
     <div class="w-full max-w-lg flex justify-center items-center gap-4 mb-4">
-        <div class="w-24 h-24">
+        <div class="w-20 h-20">
             @if ($this->prevPlace)
                 <img src="{{ asset('storage/' . $this->prevPlace->image_path) }}"
                     class="w-full h-full object-cover rounded-lg opacity-50"
                     onerror="this.src='{{ asset('storage/places/placeholder.png') }}'; this.onerror=null;">
             @endif
         </div>
-        <div class="w-32 h-32">
+        <div class="w-24 h-24">
             @if ($this->currentPlace)
                 <img src="{{ asset('storage/' . $this->currentPlace->image_path) }}"
-                    class="w-full h-full object-cover rounded-2xl border-4 preview-highlight shadow-lg"
+                    class="w-full h-full object-cover rounded-2xl border-2 preview-highlight shadow-lg"
                     onerror="this.src='{{ asset('storage/places/placeholder.png') }}'; this.onerror=null;">
             @endif
         </div>
-        <div class="w-24 h-24">
+        <div class="w-20 h-20">
             @if ($this->nextPlace)
                 <img src="{{ asset('storage/' . $this->nextPlace->image_path) }}"
                     class="w-full h-full object-cover rounded-lg opacity-50"
@@ -94,8 +104,9 @@ $nextPlace = computed(function () {
 
     {{-- カード表示エリア --}}
     <div id="swipe-area" class="w-full text-center">
+
         @if ($this->currentPlace)
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-700 mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-700 mb-2">
                 {{ $this->currentPlace->name }}
             </h1>
             <div class="flex justify-center">
@@ -104,7 +115,7 @@ $nextPlace = computed(function () {
                     onclick="toggleCardSelection(this)"
                     onkeypress="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleCardSelection(this); }">
                     <img src="{{ asset('storage/' . $this->currentPlace->image_path) }}"
-                        alt="{{ $this->currentPlace->name }}" class="card-image h-80 md:h-96"
+                        alt="{{ $this->currentPlace->name }}" class="card-image h-65 md:h-70"
                         onerror="this.src='{{ asset('storage/places/placeholder.png') }}'; this.onerror=null;">
                     <div class="sparkle-effect" style="display: none;"></div>
                 </div>
@@ -123,21 +134,14 @@ $nextPlace = computed(function () {
     <div class="choice-buttons w-full max-w-lg flex justify-between mt-8">
         <button wire:click="prev" {{ $this->totalPlaces < 2 ? 'disabled' : '' }} aria-label="前のカード"
             class="inline-block px-10 py-5 bg-blue-200 text-gray-700 rounded-2xl text-4xl font-bold hover:bg-blue-300 transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed min-h-[48px] min-w-[48px]">
-            &lt;
+            👈️
         </button>
         <button wire:click="next" {{ $this->totalPlaces < 2 ? 'disabled' : '' }} aria-label="次のカード"
             class="inline-block px-10 py-5 bg-green-200 text-gray-700 rounded-2xl text-4xl font-bold hover:bg-green-300 transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed min-h-[48px] min-w-[48px]">
-            &gt;
+            👉️
         </button>
     </div>
 
-    {{-- メニューリンク --}}
-    <div class="text-center mt-8">
-        <a href="/places" wire:navigate
-            class="inline-block px-2 py-1 bg-gray-400 text-white rounded text-xs hover:bg-gray-500 transition duration-150 opacity-75 hover:opacity-100">
-            メニュー
-        </a>
-    </div>
 
     {{-- カード選択とスワイプ機能 --}}
     <script>
