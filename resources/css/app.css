@@ -98,5 +98,6 @@
 @layer base {
     body {
         @apply bg-pic-bg text-gray-700;
+        font-family: 'M PLUS Rounded 1c', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
     }
 }
