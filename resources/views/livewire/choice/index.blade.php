@@ -11,6 +11,9 @@ state(['allPlaces' => null]);
 state(['currentIndex' => 0]);
 state(['totalPlaces' => 0]);
 
+// ★ 抜けていた部分：選択状態を保存する変数
+state(['selectedPlaceId' => null]);
+
 // 初期化処理
 mount(function () {
     $this->allPlaces = Place::where('user_id', auth()->id())
@@ -23,6 +26,7 @@ mount(function () {
 $next = function () {
     if ($this->totalPlaces > 0) {
         $this->currentIndex = ($this->currentIndex + 1) % $this->totalPlaces;
+        $this->selectedPlaceId = null; // ★ 選択状態をリセット
     }
 };
 
@@ -34,8 +38,18 @@ $prev = function () {
             $newIndex = $this->totalPlaces - 1;
         }
         $this->currentIndex = $newIndex;
+        $this->selectedPlaceId = null; // ★ 選択状態をリセット
     }
 };
+
+// ★★★ 抜けていた関数を追加 ★★★
+// カードがクリックされた時の処理
+$selectCurrentPlace = function () {
+    if ($this->currentPlace) {
+        $this->selectedPlaceId = $this->currentPlace->id;
+    }
+};
+// ★★★ ここまで ★★★
 
 // プレビュー用：前のカード
 $prevPlace = computed(function () {
@@ -71,7 +85,8 @@ $nextPlace = computed(function () {
 
     {{-- ヘッダー --}}
     <div class="w-full max-w-lg mb-4 flex justify-between items-center pb-4 border-b border-gray-200">
-        <h1 class="text-3xl md:text-4xl font-bold text-gray-700">きょうのよてい</h1>
+        {{-- ★ h1のタイトルが「きょうのよてい」になっていたので「カードをえらぶ」などに修正（お好みで） --}}
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-700">カードをえらぶ</h1>
         <a href="/places" wire:navigate
             class="inline-block px-2 py-1 bg-gray-400 text-white rounded text-xs hover:bg-gray-500 transition duration-150 opacity-75 hover:opacity-100">
             メニュー
@@ -110,14 +125,19 @@ $nextPlace = computed(function () {
                 {{ $this->currentPlace->name }}
             </h1>
             <div class="flex justify-center">
-                <div id="card-main" role="button" tabindex="0" aria-label="{{ $this->currentPlace->name }}を選択"
-                    aria-pressed="false" class="card w-full max-w-lg cursor-pointer relative"
-                    onclick="toggleCardSelection(this)"
-                    onkeypress="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleCardSelection(this); }">
+                {{-- ★★★ HTMLの修正箇所 ★★★ --}}
+                <div wire:click="selectCurrentPlace" {{-- ★ onclick ではなく wire:click を使う --}} role="button" tabindex="0"
+                    aria-label="{{ $this->currentPlace->name }}を選択" {{-- ★ クラスに $selectedPlaceId の判定を追加 --}}
+                    class="card w-full max-w-lg cursor-pointer relative {{ $selectedPlaceId === $this->currentPlace->id ? 'selected-card' : '' }}"
+                    {{-- ★ onkeypress は不要なので削除 --}}>
                     <img src="{{ asset('storage/' . $this->currentPlace->image_path) }}"
                         alt="{{ $this->currentPlace->name }}" class="card-image h-65 md:h-70"
                         onerror="this.src='{{ asset('storage/places/placeholder.png') }}'; this.onerror=null;">
-                    <div class="sparkle-effect" style="display: none;"></div>
+
+                    {{-- ★ キラキラエフェクトの表示判定を追加 --}}
+                    @if ($selectedPlaceId === $this->currentPlace->id)
+                        <div class="sparkle-effect"></div> {{-- ★ style="display: none;" を削除 --}}
+                    @endif
                 </div>
             </div>
         @else
@@ -130,7 +150,7 @@ $nextPlace = computed(function () {
         @endif
     </div>
 
-    {{-- 操作ボタン --}}
+    {{-- 操作ボタン (変更なし) --}}
     <div class="choice-buttons w-full max-w-lg flex justify-between mt-8">
         <button wire:click="prev" {{ $this->totalPlaces < 2 ? 'disabled' : '' }} aria-label="前のカード"
             class="inline-block px-10 py-5 bg-blue-200 text-gray-700 rounded-2xl text-4xl font-bold hover:bg-blue-300 transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed min-h-[48px] min-w-[48px]">
@@ -143,50 +163,23 @@ $nextPlace = computed(function () {
     </div>
 
 
-    {{-- カード選択とスワイプ機能 --}}
     <script>
-        function toggleCardSelection(cardElement) {
-            const sparkleEffect = cardElement.querySelector('.sparkle-effect');
-            const isSelected = cardElement.classList.contains('selected-card');
-
-            if (isSelected) {
-                cardElement.classList.remove('selected-card');
-                cardElement.setAttribute('aria-pressed', 'false');
-                if (sparkleEffect) sparkleEffect.style.display = 'none';
-            } else {
-                cardElement.classList.add('selected-card');
-                cardElement.setAttribute('aria-pressed', 'true');
-                if (sparkleEffect) sparkleEffect.style.display = 'block';
-            }
-        }
-
-        function resetCardSelection() {
-            const cardElement = document.getElementById('card-main');
-            if (cardElement) {
-                cardElement.classList.remove('selected-card');
-                cardElement.setAttribute('aria-pressed', 'false');
-                const sparkleEffect = cardElement.querySelector('.sparkle-effect');
-                if (sparkleEffect) sparkleEffect.style.display = 'none';
-            }
-        }
-
         document.addEventListener('livewire:navigated', () => {
             const swipeArea = document.getElementById('swipe-area');
             if (!swipeArea) return;
 
+            // --- スワイプ処理のコード (変更なし) ---
             let touchStartX = 0,
                 touchEndX = 0,
                 touchStartY = 0,
                 touchEndY = 0;
             const swipeThreshold = 50;
-
             swipeArea.addEventListener('touchstart', (e) => {
                 touchStartX = e.changedTouches[0].screenX;
                 touchStartY = e.changedTouches[0].screenY;
             }, {
                 passive: true
             });
-
             swipeArea.addEventListener('touchend', (e) => {
                 touchEndX = e.changedTouches[0].screenX;
                 touchEndY = e.changedTouches[0].screenY;
@@ -199,30 +192,25 @@ $nextPlace = computed(function () {
                 const horizontalDist = touchEndX - touchStartX;
                 const verticalDist = touchEndY - touchStartY;
                 if (Math.abs(verticalDist) > Math.abs(horizontalDist)) return;
-
-                if (horizontalDist < -swipeThreshold) {
-                    resetCardSelection();
-                    @this.call('next');
-                }
-                if (horizontalDist > swipeThreshold) {
-                    resetCardSelection();
-                    @this.call('prev');
-                }
+                if (horizontalDist < -swipeThreshold) @this.call('next');
+                if (horizontalDist > swipeThreshold) @this.call('prev');
             }
-        });
+            // --- スワイプ処理ここまで ---
 
-        document.addEventListener('livewire:navigated', () => {
-            const prevBtn = document.querySelector('button[wire\\:click="prev"]');
-            const nextBtn = document.querySelector('button[wire\\:click="next"]');
 
-            if (prevBtn) {
-                prevBtn.addEventListener('click', () => {
-                    setTimeout(resetCardSelection, 100);
-                });
-            }
-            if (nextBtn) {
-                nextBtn.addEventListener('click', () => {
-                    setTimeout(resetCardSelection, 100);
+            // ★★★ 音声再生のコード (変更なし) ★★★
+            // 音声ファイルは /public/sounds/select-sound.mp3 に配置してください
+            const selectSound = new Audio('/sounds/select-sound.mp3');
+            selectSound.volume = 0.5;
+
+            // ★ 探す対象を wire:click="selectCurrentPlace" に修正
+            const mainCard = swipeArea.querySelector('div[wire\\:click="selectCurrentPlace"]');
+
+            if (mainCard) {
+                // カードにクリックイベントリスナーを追加
+                mainCard.addEventListener('click', () => {
+                    selectSound.currentTime = 0;
+                    selectSound.play().catch(e => console.error("音声の再生に失敗しました:", e));
                 });
             }
         });
