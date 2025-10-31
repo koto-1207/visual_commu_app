@@ -1,11 +1,102 @@
-@import 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap');
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+/* ==============================================
+カスタムコンポーネント
+   ============================================== */
+
+@layer components {
+
+    /* 利用者画面のカードの基本デザイン */
+    .card {
+        @apply bg-white border-pic-mint p-6 text-center shadow-md transition-all duration-200 ease-in-out;
+        border-width: 3px;
+        border-radius: 1.5rem;
+    }
+
+    /* カード内の画像の基本デザイン */
+    .card-image {
+        @apply w-full object-cover rounded-2xl mb-4;
+        height: 220px;
+    }
+
+    /* カード内の文字の基本デザイン */
+    .card-title {
+        @apply text-4xl font-bold text-gray-800 break-words;
+    }
+
+    /* 選択されたカードのスタイル */
+    .selected-card {
+        @apply border-pic-pink;
+        box-shadow: 0 8px 20px rgba(247, 178, 183, 0.4);
+        transform: scale(1.08);
+    }
+
+    /* プレビューエリアのハイライト */
+    .preview-highlight {
+        @apply border-pic-pink;
+    }
+}
+
+/* ==============================================
+カスタムアニメーション
+   ============================================== */
+
+@layer utilities {
+
+    /* キラキラアニメーション */
+    @keyframes sparkle {
+        0% {
+            opacity: 0;
+            transform: scale(0.5);
+        }
+
+        50% {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        100% {
+            opacity: 0;
+            transform: scale(0.5);
+        }
+    }
+
+    /* キラキラエフェクト要素 */
+    .sparkle-effect {
+        @apply absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden;
+        border-radius: 1.5rem;
+    }
+
+    .sparkle-effect::before,
+    .sparkle-effect::after {
+        content: '✨';
+        @apply absolute text-3xl opacity-0;
+        animation: sparkle 1s ease-in-out infinite;
+    }
+
+    .sparkle-effect::before {
+        top: 15%;
+        left: 15%;
+        animation-delay: 0s;
+    }
+
+    .sparkle-effect::after {
+        bottom: 15%;
+        right: 15%;
+        animation-delay: 0.3s;
+    }
+}
+
+/* ==============================================
+ベーススタイル
+   ============================================== */
+
+@layer base {
+    body {
+        @apply bg-pic-bg text-gray-700;
+    }
 }
