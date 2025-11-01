@@ -89,19 +89,9 @@ test -d /var/www/html/resources/views/livewire && echo "✅ Livewire directory e
 echo "Testing if Volt can resolve pages.auth.login component..."
 php artisan tinker --execute="echo Livewire\Volt\Volt::class;" 2>&1 || echo "Volt class not available"
 
-echo "Testing Volt::render() directly..."
-php -r "
-require '/var/www/html/vendor/autoload.php';
-\$app = require_once '/var/www/html/bootstrap/app.php';
-\$app->boot();
-try {
-    \$result = Livewire\Volt\Volt::render('pages.auth.login');
-    echo 'SUCCESS: Volt::render() returned: ' . get_class(\$result) . PHP_EOL;
-} catch (\Exception \$e) {
-    echo 'ERROR: ' . \$e->getMessage() . PHP_EOL;
-    echo 'File: ' . \$e->getFile() . ':' . \$e->getLine() . PHP_EOL;
-}
-" 2>&1 || echo "Could not test Volt::render()"
+echo "Testing Login component class..."
+test -f /var/www/html/app/Livewire/Auth/Login.php && echo "✅ Login component exists" || echo "❌ Login component missing"
+test -f /var/www/html/resources/views/livewire/auth/login.blade.php && echo "✅ Login view exists" || echo "❌ Login view missing"
 
 echo "Checking Laravel storage/logs for errors..."
 if [ -f /var/www/html/storage/logs/laravel.log ]; then
