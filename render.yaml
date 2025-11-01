@@ -25,7 +25,7 @@ services:
       - key: QUEUE_CONNECTION
         value: database
       - key: DB_CONNECTION
-        value: mysql
+        value: pgsql
       # 以下の環境変数は Render のダッシュボードで設定してください（セキュリティのため）
       # - APP_KEY (必須)
       # - APP_URL (例: https://your-app-name.onrender.com)
