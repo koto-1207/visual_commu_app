@@ -20,15 +20,30 @@ mkdir -p /var/www/html/storage/app/public
 
 echo "Clearing caches..."
 # Clear all caches first
-php artisan cache:clear 2>&1 || true
-php artisan config:clear 2>&1 || true
-php artisan route:clear 2>&1 || true
-php artisan view:clear 2>&1 || true
+php artisan cache:clear || true
+php artisan config:clear || true
+php artisan route:clear || true
+php artisan view:clear || true
 
-echo "Caching configuration and routes..."
-# Cache config and routes (show errors if any)
-php artisan config:cache 2>&1
-php artisan route:cache 2>&1
+echo "Caching configuration..."
+# Cache config
+php artisan config:cache
+
+echo "Caching routes..."
+# Cache routes
+php artisan route:cache
+
+echo "Verifying route cache..."
+if [ -f /var/www/html/bootstrap/cache/routes-v7.php ]; then
+    echo "✅ Route cache file exists"
+    ls -lh /var/www/html/bootstrap/cache/routes-v7.php
+    
+    echo "Checking for /login route..."
+    php artisan route:list --path=login || echo "⚠️ Could not list routes"
+else
+    echo "❌ ERROR: Route cache file NOT created!"
+    exit 1
+fi
 
 echo "Running migrations..."
 # Run migrations
