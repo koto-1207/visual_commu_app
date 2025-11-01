@@ -7,29 +7,22 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Collection;
 
-// 編集中のカード情報
 state(['editingPlaceId' => null]);
 state(['editingPlaceName' => '']);
 state(['editingPlaceImage' => '']);
-
-// 予定リスト管理
 state(['scheduledIds' => []]);
 state(['scheduledPlaces' => null]);
-
-// 初期化処理
 mount(function () {
     $this->scheduledIds = session('schedule_list', []);
     $this->updateScheduledPlaces();
 });
 
-// 予定リストの並び替え処理
 $updateSortOrder = function ($items) {
     $this->scheduledIds = array_column($items, 'value');
     session(['schedule_list' => $this->scheduledIds]);
     $this->updateScheduledPlaces();
 };
 
-// 予定リストの更新処理
 $updateScheduledPlaces = function () {
     if (empty($this->scheduledIds)) {
         $this->scheduledPlaces = collect();
@@ -43,7 +36,6 @@ $updateScheduledPlaces = function () {
         ->values();
 };
 
-// 予定リストの追加・削除
 $toggleSchedule = function ($id) {
     $index = array_search($id, $this->scheduledIds);
     if ($index !== false) {
@@ -56,14 +48,12 @@ $toggleSchedule = function ($id) {
     $this->updateScheduledPlaces();
 };
 
-// 予定リストのクリア
 $clearSchedule = function () {
     $this->scheduledIds = [];
     session(['schedule_list' => []]);
     $this->updateScheduledPlaces();
 };
 
-// カードの削除
 $delete = function (Place $place) {
     if ($place->image_path && Storage::disk('public')->exists($place->image_path)) {
         Storage::disk('public')->delete($place->image_path);
@@ -80,14 +70,12 @@ $delete = function (Place $place) {
     $this->dispatch('$refresh');
 };
 
-// カードの編集開始
 $edit = function (Place $place) {
     $this->editingPlaceId = $place->id;
     $this->editingPlaceName = $place->name;
     $this->editingPlaceImage = $place->image_path;
 };
 
-// カードの更新保存
 $update = function () {
     $validatedData = $this->validate([
         'editingPlaceName' => 'required|string|max:255',
@@ -99,17 +87,14 @@ $update = function () {
     $this->dispatch('$refresh');
 };
 
-// 編集のキャンセル
 $cancelEdit = function () {
     $this->reset('editingPlaceId', 'editingPlaceName', 'editingPlaceImage');
 };
 
-// ログインユーザーのカードのみ取得
 $places = fn() => Place::where('user_id', auth()->id())
     ->latest()
     ->get();
 
-// ログアウト処理
 $logout = function (Logout $logout) {
     $logout();
     $this->redirect('/', navigate: true);
@@ -117,7 +102,6 @@ $logout = function (Logout $logout) {
 
 ?>
 <div class="p-6">
-    {{-- 処理中オーバーレイ --}}
     <div wire:loading.delay wire:target="delete,clearSchedule,updateSortOrder"
         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white p-6 rounded-xl shadow-lg">
@@ -125,14 +109,13 @@ $logout = function (Logout $logout) {
         </div>
     </div>
 
-    {{-- ヘッダーメニュー --}}
-    <div class="mb-5 p-3 md:p-4 bg-gray-100 rounded-lg">
+    <div class="mb-5 p-3 md:p-4 bg-gradient-to-r from-pic-bg to-white rounded-xl shadow-sm border border-pic-mint/20">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-3">
             <h2 class="text-lg md:text-xl font-bold text-gray-700">管理メニュー</h2>
 
             <div class="flex gap-2 w-full sm:w-auto">
                 <a href="{{ route('profile') }}" wire:navigate
-                    class="flex-1 sm:flex-none px-3 md:px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 flex items-center justify-center gap-2 text-sm md:text-base">
+                    class="flex-1 sm:flex-none px-3 md:px-4 py-2 bg-pic-pink text-white rounded-lg hover:bg-opacity-80 flex items-center justify-center gap-2 text-sm md:text-base shadow-sm transition duration-150">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20"
                         fill="currentColor">
                         <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
@@ -142,7 +125,7 @@ $logout = function (Logout $logout) {
                     <span class="sm:hidden">アカウント</span>
                 </a>
                 <button wire:click="logout"
-                    class="flex-1 sm:flex-none px-3 md:px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 flex items-center justify-center gap-2 text-sm md:text-base">
+                    class="flex-1 sm:flex-none px-3 md:px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 flex items-center justify-center gap-2 text-sm md:text-base shadow-sm transition duration-150">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20"
                         fill="currentColor">
                         <path fill-rule="evenodd"
@@ -156,23 +139,22 @@ $logout = function (Logout $logout) {
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
             <a href="/schedule" wire:navigate
-                class="px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 text-center text-sm md:text-base"
+                class="px-4 py-2 bg-pic-mint text-white rounded-lg hover:bg-opacity-80 text-center text-sm md:text-base shadow-sm transition duration-150 font-medium"
                 target="_blank">
-                スケジュール画面
+                📅 スケジュール画面
             </a>
             <a href="/choice" wire:navigate
-                class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 text-center text-sm md:text-base"
+                class="px-4 py-2 bg-pic-pink text-white rounded-lg hover:bg-opacity-80 text-center text-sm md:text-base shadow-sm transition duration-150 font-medium"
                 target="_blank">
-                選択画面
+                🎯 選択画面
             </a>
             <a href="/places/create" wire:navigate
-                class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-center text-sm md:text-base">
-                新しい場所を登録
+                class="px-4 py-2 bg-pic-mint text-white rounded-lg hover:bg-opacity-80 text-center text-sm md:text-base shadow-sm transition duration-150 font-medium">
+                ➕ 新しい場所を登録
             </a>
         </div>
     </div>
 
-    {{-- 今日の予定リスト --}}
     <div class="mb-8">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-3">
             <h2 class="text-base md:text-lg font-semibold text-gray-800">今日の予定（ドラッグで並び替え）</h2>
@@ -221,7 +203,6 @@ $logout = function (Logout $logout) {
         </div>
     </div>
 
-    {{-- 全カード一覧 --}}
     <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-3">登録された場所（全カード）</h2>
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
         @foreach ($this->places() as $place)
@@ -232,7 +213,6 @@ $logout = function (Logout $logout) {
             <div
                 class="border-4 {{ $isOnSchedule ? 'border-green-500' : 'border-gray-300' }} p-2 md:p-3 rounded-lg text-center bg-white shadow">
                 @if ($editingPlaceId === $place->id)
-                    {{-- 編集モード --}}
                     @if ($editingPlaceImage)
                         <img src="{{ asset('storage/' . $editingPlaceImage) }}" alt="{{ $editingPlaceName }}"
                             class="w-full aspect-[4/3] object-cover rounded my-2"
@@ -252,7 +232,6 @@ $logout = function (Logout $logout) {
                     <button wire:click="cancelEdit"
                         class="w-full px-2 py-1 bg-gray-500 text-white rounded text-xs">キャンセル</button>
                 @else
-                    {{-- 通常モード --}}
                     <p class="text-sm md:text-base font-bold text-gray-700 mb-2 truncate">{{ $place->name }}</p>
                     <img src="{{ asset('storage/' . $place->image_path) }}" alt="{{ $place->name }}"
                         class="w-full aspect-[4/3] object-cover rounded mb-2"

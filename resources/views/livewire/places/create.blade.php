@@ -20,10 +20,9 @@ $save = function () {
     Place::create([
         'name' => $validated['name'],
         'image_path' => $path,
-        'user_id' => auth()->id(), // ログインユーザーのIDを保存
+        'user_id' => auth()->id(),
     ]);
 
-    // 登録成功したら一覧ページへ移動
     return $this->redirect('/places', navigate: true);
 };
 

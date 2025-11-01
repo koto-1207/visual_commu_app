@@ -16,12 +16,15 @@ layout('components.layouts.user');
 
         {{-- タイトル --}}
         <h1 class="text-3xl lg:text-4xl font-bold text-gray-700 mb-2">
-            見つけよう、伝えよう！
+            外出支援サポートアプリ
         </h1>
 
         {{-- 説明文 --}}
-        <p class="text-md lg:text-lg text-gray-600 mb-8 max-w-md">
-            見てわかる、指で伝わる、コミュニケーション。
+        <p class="text-md lg:text-lg text-gray-600 mb-8 max-w-md whitespace-pre-line">
+            『ぴくこみゅ』は、写真カードで
+            「きょうの予定」をかんたんに作ったり、
+            「行きたい場所」を選ぶお手伝いをする
+            コミュニケーション・アプリです。
         </p>
 
         {{-- ログインボタン --}}

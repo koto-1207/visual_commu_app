@@ -10,16 +10,8 @@ class Place extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = ['name', 'image_path', 'user_id'];
 
-    /**
-     * このPlaceが属するUserを取得
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
