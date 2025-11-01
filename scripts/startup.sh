@@ -36,8 +36,28 @@ echo "Caching configuration..."
 # Cache config
 php artisan config:cache
 
-echo "Caching routes..."
-# Cache routes
+echo "Running migrations..."
+# Run migrations
+php artisan migrate --force --isolated 2>&1 || echo "⚠️ Migrations skipped"
+
+echo "Setting up storage and assets..."
+# Storage link and Livewire assets
+php artisan storage:link 2>&1 || true
+php artisan livewire:publish --assets 2>&1 || true
+
+echo "✅ Laravel initialized successfully"
+echo "Starting supervisord..."
+
+# Start supervisord in the background
+/usr/bin/supervisord -c /etc/supervisord.conf &
+SUPERVISOR_PID=$!
+
+# Wait for PHP-FPM and nginx to start
+sleep 3
+
+echo "Services started, now caching routes..."
+# Cache routes AFTER services are running
+# This ensures any composer scripts run by /start.sh don't interfere
 php artisan route:cache
 
 echo "Verifying route cache..."
@@ -49,21 +69,9 @@ if [ -f /var/www/html/bootstrap/cache/routes-v7.php ]; then
     php artisan route:list --path=login || echo "⚠️ Could not list routes"
 else
     echo "❌ ERROR: Route cache file NOT created!"
-    exit 1
 fi
 
-echo "Running migrations..."
-# Run migrations
-php artisan migrate --force --isolated 2>&1 || echo "⚠️ Migrations skipped"
+echo "✅ Application ready"
 
-echo "Setting up storage and assets..."
-# Storage link and Livewire assets
-php artisan storage:link 2>&1 || true
-php artisan livewire:publish --assets 2>&1 || true
-
-echo "✅ Laravel initialized successfully"
-echo "Starting web services..."
-
-# Start supervisord (this will keep the container running)
-exec /start.sh
-
+# Wait for supervisord to finish (keeps container running)
+wait $SUPERVISOR_PID
