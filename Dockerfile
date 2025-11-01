@@ -1,11 +1,11 @@
 # richarvey/nginx-php-fpmをベースとする
 FROM richarvey/nginx-php-fpm:latest
 
-
+# 1. Alpine Linuxのパッケージをすべて最新にアップグレード
+# (php-pgsqlドライバーを更新し、SCRAM認証をサポートするため)
 RUN apk upgrade --update
 
-# ベースイメージ(Alpine Linux)を更新し、
-# Node.js と npm をインストールします (LTS版を指定)
+# 2. Node.js LTS (v20+) と npm をインストール
 RUN apk add --update nodejs-lts npm
 
 # Image config
@@ -25,36 +25,19 @@ ENV COMPOSER_ALLOW_SUPERUSER 1
 # 作業ディレクトリを設定
 WORKDIR /var/www/html
 
-# ----------------------------------------------------
-# ★★★ ビルド手順を最適化 ★★★
-# ----------------------------------------------------
+# 3. アプリケーションの全ファイルをコピー
+# (.dockerignoreにより、node_modulesとpackage-lock.jsonは除外される)
+COPY . .
 
-# 1. PHPの依存関係ファイルを先にコピー
-COPY composer.json composer.lock ./
-
-# 2. PHPの依存関係をインストール
+# 4. PHPの依存関係をインストール
 RUN composer install --no-dev --no-scripts
 
-# 3. Node.jsの依存関係ファイルのみをコピー (package-lock.json はコピーしない)
-COPY package.json ./
-
-# 4. Node.jsの依存関係をクリーンインストール
+# 5. Node.jsの依存関係をクリーンインストール
+# (Alpine Linux用の正しいpackage-lock.jsonがここで新規作成されます)
 RUN npm install
-
-# 5. アプリケーションの全ファイルをコピー
-COPY . .
 
 # 6. フロントエンドのアセットをビルド
 RUN npm run build
-
-# 7. Laravelの最適化コマンドは /scripts/00-laravel-deploy.sh で実行するため、ここでは実行しない
-# RUN php artisan config:cache
-# RUN php artisan route:cache
-# RUN php artisan view:cache
-
-# ----------------------------------------------------
-# ★★★ ビルド手順ここまで ★★★
-# ----------------------------------------------------
 
 # Set proper permissions for Laravel storage and bootstrap cache
 RUN mkdir -p /var/www/html/storage/framework/{sessions,views,cache} \
