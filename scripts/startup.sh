@@ -24,6 +24,7 @@ php artisan config:clear || true
 php artisan route:clear || true
 php artisan view:clear || true
 php artisan event:clear || true
+php artisan livewire:clear || echo "Livewire clear not available"
 
 # Manually delete cache files to ensure clean state
 echo "Removing old cache files..."
@@ -40,8 +41,10 @@ composer dump-autoload --optimize --no-dev || true
 echo "Caching configuration..."
 php artisan config:cache
 
-echo "Optimizing for production..."
-php artisan optimize
+echo "Caching routes..."
+php artisan route:cache
+
+echo "NOTE: Skipping view:cache because it conflicts with Volt dynamic components"
 
 echo "Verifying Volt can find views..."
 test -d /var/www/html/resources/views/livewire/pages/auth && echo "✅ Auth views directory exists" || echo "❌ Auth views directory missing"
