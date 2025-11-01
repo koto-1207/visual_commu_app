@@ -44,10 +44,10 @@ COPY . .
 # 6. フロントエンドのアセットをビルド
 RUN npm run build
 
-# 7. Laravelの最適化コマンドを実行
-RUN php artisan config:cache
-RUN php artisan route:cache
-RUN php artisan view:cache
+# 7. Laravelの最適化コマンドは /scripts/00-laravel-deploy.sh で実行するため、ここでは実行しない
+# RUN php artisan config:cache
+# RUN php artisan route:cache
+# RUN php artisan view:cache
 
 # ----------------------------------------------------
 # ★★★ ビルド手順ここまで ★★★
