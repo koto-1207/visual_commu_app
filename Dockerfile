@@ -30,7 +30,7 @@ WORKDIR /var/www/html
 COPY . .
 
 # 4. PHPの依存関係をインストール
-RUN composer install --no-dev --no-scripts
+RUN composer install --no-dev --optimize-autoloader
 
 # 5. Node.jsの依存関係をクリーンインストール
 # (Alpine Linux用の正しいpackage-lock.jsonがここで新規作成されます)
