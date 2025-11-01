@@ -13,10 +13,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Mount Volt early in the application lifecycle
-        Volt::mount([
-            resource_path('views/livewire'),
-        ]);
+        //
     }
 
     /**
@@ -27,5 +24,10 @@ class AppServiceProvider extends ServiceProvider
         if (env('APP_ENV') == 'production') {
             $url->forceScheme('https');
         }
+
+        // Mount Volt views after application is fully booted
+        Volt::mount([
+            resource_path('views/livewire'),
+        ]);
     }
 }
