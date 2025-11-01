@@ -45,6 +45,11 @@ php artisan optimize
 
 echo "Verifying Volt can find views..."
 test -d /var/www/html/resources/views/livewire/pages/auth && echo "✅ Auth views directory exists" || echo "❌ Auth views directory missing"
+echo "Checking specific view files..."
+test -f /var/www/html/resources/views/livewire/pages/auth/login.blade.php && echo "✅ login.blade.php exists" || echo "❌ login.blade.php missing"
+test -f /var/www/html/resources/views/livewire/pages/auth/register.blade.php && echo "✅ register.blade.php exists" || echo "❌ register.blade.php missing"
+echo "Listing auth directory contents..."
+ls -la /var/www/html/resources/views/livewire/pages/auth/ || echo "Cannot list directory"
 
 echo "Running migrations..."
 php artisan migrate --force --isolated 2>&1 || echo "⚠️ Migrations skipped"
@@ -59,12 +64,12 @@ echo "✅ Laravel pre-initialization complete"
 echo "Verifying route cache..."
 if [ -f /var/www/html/bootstrap/cache/routes-v7.php ]; then
     echo "✅ Route cache file exists"
-    echo "Listing authentication routes..."
-    php artisan route:list --path=login || echo "Could not list login route"
-    php artisan route:list --path=register || echo "Could not list register route"
 else
     echo "❌ WARNING: Route cache file NOT created!"
 fi
+
+echo "Listing all routes..."
+php artisan route:list || echo "Could not list routes"
 
 echo "✅ Application fully ready"
 
