@@ -20,9 +20,10 @@ class VoltServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Mount Volt views directory
+        // Mount Volt views directory using absolute path
+        // This ensures it works both in local development and production
         Volt::mount([
-            resource_path('views/livewire'),
+            base_path('resources/views/livewire'),
         ]);
     }
 }
