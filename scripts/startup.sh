@@ -18,21 +18,33 @@ mkdir -p /var/www/html/storage/framework/{sessions,views,cache}
 mkdir -p /var/www/html/storage/logs
 mkdir -p /var/www/html/storage/app/public
 
-echo "Clearing caches..."
+echo "Clearing all caches..."
 php artisan cache:clear || true
 php artisan config:clear || true
 php artisan route:clear || true
 php artisan view:clear || true
+php artisan event:clear || true
 
-# Manually delete cache files
+# Manually delete cache files to ensure clean state
 echo "Removing old cache files..."
 rm -f /var/www/html/bootstrap/cache/routes-v7.php || true
 rm -f /var/www/html/bootstrap/cache/config.php || true
+rm -f /var/www/html/bootstrap/cache/services.php || true
+rm -f /var/www/html/bootstrap/cache/packages.php || true
 rm -rf /var/www/html/storage/framework/cache/* || true
 rm -rf /var/www/html/storage/framework/views/* || true
 
+echo "Optimizing autoloader..."
+composer dump-autoload --optimize --no-dev || true
+
 echo "Caching configuration..."
 php artisan config:cache
+
+echo "Optimizing for production..."
+php artisan optimize
+
+echo "Verifying Volt can find views..."
+test -d /var/www/html/resources/views/livewire/pages/auth && echo "✅ Auth views directory exists" || echo "❌ Auth views directory missing"
 
 echo "Running migrations..."
 php artisan migrate --force --isolated 2>&1 || echo "⚠️ Migrations skipped"
@@ -43,26 +55,18 @@ php artisan livewire:publish --assets 2>&1 || true
 
 echo "✅ Laravel pre-initialization complete"
 
-# Create a custom entrypoint script that will run route:cache after services start
-cat > /tmp/post-start.sh << 'POSTSTART'
-#!/bin/bash
-sleep 5
-echo "Caching routes after services started..."
-php artisan route:cache
+# Verify route cache
 echo "Verifying route cache..."
 if [ -f /var/www/html/bootstrap/cache/routes-v7.php ]; then
     echo "✅ Route cache file exists"
-    php artisan route:list --path=login || true
+    echo "Listing authentication routes..."
+    php artisan route:list --path=login || echo "Could not list login route"
+    php artisan route:list --path=register || echo "Could not list register route"
 else
-    echo "❌ ERROR: Route cache file NOT created!"
+    echo "❌ WARNING: Route cache file NOT created!"
 fi
+
 echo "✅ Application fully ready"
-POSTSTART
-
-chmod +x /tmp/post-start.sh
-
-# Run post-start script in background
-/tmp/post-start.sh &
 
 echo "Starting web services..."
 # Use the original start script from the base image
