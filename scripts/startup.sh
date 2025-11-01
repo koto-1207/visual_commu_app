@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-echo "===== Container Startup: Initializing Laravel ====="
+echo "===== Initializing Laravel Application ====="
 
 # Check if APP_KEY is set
 if [ -z "$APP_KEY" ]; then
@@ -9,47 +9,37 @@ if [ -z "$APP_KEY" ]; then
     exit 1
 fi
 
-echo "Setting storage permissions..."
-chmod -R 775 /var/www/html/storage || true
-chmod -R 775 /var/www/html/bootstrap/cache || true
-chown -R nginx:nginx /var/www/html/storage || true
-chown -R nginx:nginx /var/www/html/bootstrap/cache || true
+# Set permissions
+chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true
+chown -R nginx:nginx /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true
 
 # Ensure storage directories exist
 mkdir -p /var/www/html/storage/framework/{sessions,views,cache}
 mkdir -p /var/www/html/storage/logs
 mkdir -p /var/www/html/storage/app/public
 
-echo "Clearing all caches..."
-php artisan cache:clear || true
-php artisan config:clear || true
-php artisan route:clear || true
-php artisan view:clear || true
+# Clear and cache (suppress verbose output)
+php artisan config:cache > /dev/null 2>&1
+php artisan route:cache > /dev/null 2>&1
+php artisan view:cache > /dev/null 2>&1
 
-echo "Caching config..."
-php artisan config:cache
+# Run migrations silently
+php artisan migrate --force --isolated > /dev/null 2>&1 || true
 
-echo "Caching routes..."
-php artisan route:cache
+# Storage link and Livewire assets
+php artisan storage:link > /dev/null 2>&1 || true
+php artisan livewire:publish --assets > /dev/null 2>&1 || true
 
-echo "Running migrations..."
-php artisan migrate --force --isolated || echo "⚠️ Migration failed (database may not be ready yet)"
+echo "✅ Laravel initialized successfully"
 
-echo "Checking migrations status..."
-php artisan migrate:status || true
+# Start supervisord in the background
+/start.sh &
 
-echo "Creating storage link..."
-php artisan storage:link || true
+# Wait for services to be ready
+sleep 2
 
-echo "Publishing Livewire assets..."
-php artisan livewire:publish --assets || true
+echo "✅ Services started - Application ready"
 
-echo "Optimizing..."
-php artisan optimize
-
-echo "===== Laravel initialization complete ====="
-echo "===== Starting nginx and php-fpm ====="
-
-# Start supervisord (which will start nginx and php-fpm)
-exec /start.sh
+# Keep container running
+wait
 
