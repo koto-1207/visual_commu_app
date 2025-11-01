@@ -109,13 +109,13 @@ $logout = function (Logout $logout) {
         </div>
     </div>
 
-    <div class="mb-5 p-3 md:p-4 bg-gray-100 rounded-lg">
+    <div class="mb-5 p-3 md:p-4 bg-gradient-to-r from-pic-bg to-white rounded-xl shadow-sm border border-pic-mint/20">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-3">
             <h2 class="text-lg md:text-xl font-bold text-gray-700">管理メニュー</h2>
 
             <div class="flex gap-2 w-full sm:w-auto">
                 <a href="{{ route('profile') }}" wire:navigate
-                    class="flex-1 sm:flex-none px-3 md:px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 flex items-center justify-center gap-2 text-sm md:text-base">
+                    class="flex-1 sm:flex-none px-3 md:px-4 py-2 bg-pic-pink text-white rounded-lg hover:bg-opacity-80 flex items-center justify-center gap-2 text-sm md:text-base shadow-sm transition duration-150">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20"
                         fill="currentColor">
                         <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
@@ -125,7 +125,7 @@ $logout = function (Logout $logout) {
                     <span class="sm:hidden">アカウント</span>
                 </a>
                 <button wire:click="logout"
-                    class="flex-1 sm:flex-none px-3 md:px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 flex items-center justify-center gap-2 text-sm md:text-base">
+                    class="flex-1 sm:flex-none px-3 md:px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 flex items-center justify-center gap-2 text-sm md:text-base shadow-sm transition duration-150">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20"
                         fill="currentColor">
                         <path fill-rule="evenodd"
@@ -139,18 +139,18 @@ $logout = function (Logout $logout) {
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
             <a href="/schedule" wire:navigate
-                class="px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 text-center text-sm md:text-base"
+                class="px-4 py-2 bg-pic-mint text-white rounded-lg hover:bg-opacity-80 text-center text-sm md:text-base shadow-sm transition duration-150 font-medium"
                 target="_blank">
-                スケジュール画面
+                📅 スケジュール画面
             </a>
             <a href="/choice" wire:navigate
-                class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 text-center text-sm md:text-base"
+                class="px-4 py-2 bg-pic-pink text-white rounded-lg hover:bg-opacity-80 text-center text-sm md:text-base shadow-sm transition duration-150 font-medium"
                 target="_blank">
-                選択画面
+                🎯 選択画面
             </a>
             <a href="/places/create" wire:navigate
-                class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-center text-sm md:text-base">
-                新しい場所を登録
+                class="px-4 py-2 bg-pic-mint text-white rounded-lg hover:bg-opacity-80 text-center text-sm md:text-base shadow-sm transition duration-150 font-medium">
+                ➕ 新しい場所を登録
             </a>
         </div>
     </div>

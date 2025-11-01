@@ -28,7 +28,10 @@ $login = function () {
 
         {{-- ロゴ --}}
         <div class="flex justify-center">
-            <img src="{{ asset('images/logo.jpg') }}" alt="PicCommu Logo" class="h-20 w-auto">
+            <a href="/" wire:navigate>
+                <img src="{{ asset('images/logo.jpg') }}" alt="PicCommu Logo"
+                    class="h-24 w-24 rounded-full bg-white p-2 border-4 border-pic-mint shadow-md cursor-pointer hover:border-pic-pink hover:shadow-lg transition duration-150">
+            </a>
         </div>
 
         {{-- タイトル --}}
