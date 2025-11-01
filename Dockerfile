@@ -1,6 +1,9 @@
 # richarvey/nginx-php-fpmをベースとする
 FROM richarvey/nginx-php-fpm:latest
 
+
+RUN apk upgrade --update
+
 # ベースイメージ(Alpine Linux)を更新し、
 # Node.js と npm をインストールします (LTS版を指定)
 RUN apk add --update nodejs-lts npm
