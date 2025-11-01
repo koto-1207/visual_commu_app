@@ -139,17 +139,17 @@ $logout = function (Logout $logout) {
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
             <a href="/schedule" wire:navigate
-                class="px-4 py-2 bg-pic-mint text-white rounded-lg hover:bg-opacity-80 text-center text-sm md:text-base shadow-sm transition duration-150 font-medium"
+                class="px-4 py-2 bg-pic-mint text-white rounded-lg hover:bg-opacity-80 text-center text-base md:text-lg shadow-sm transition duration-150 font-semibold"
                 target="_blank">
                 📅 スケジュール画面
             </a>
             <a href="/choice" wire:navigate
-                class="px-4 py-2 bg-pic-pink text-white rounded-lg hover:bg-opacity-80 text-center text-sm md:text-base shadow-sm transition duration-150 font-medium"
+                class="px-4 py-2 bg-pic-pink text-white rounded-lg hover:bg-opacity-80 text-center text-base md:text-lg shadow-sm transition duration-150 font-semibold"
                 target="_blank">
-                🎯 選択画面
+                👆️ 選択画面
             </a>
             <a href="/places/create" wire:navigate
-                class="px-4 py-2 bg-pic-mint text-white rounded-lg hover:bg-opacity-80 text-center text-sm md:text-base shadow-sm transition duration-150 font-medium">
+                class="px-4 py-2 bg-pic-mint text-white rounded-lg hover:bg-opacity-80 text-center text-base md:text-lg shadow-sm transition duration-150 font-semibold">
                 ➕ 新しい場所を登録
             </a>
         </div>
@@ -157,7 +157,7 @@ $logout = function (Logout $logout) {
 
     <div class="mb-8">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-3">
-            <h2 class="text-base md:text-lg font-semibold text-gray-800">今日の予定（ドラッグで並び替え）</h2>
+            <h2 class="text-base md:text-lg font-semibold text-gray-800">今日の予定</h2>
             <button wire:click="clearSchedule"
                 class="w-full sm:w-auto px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm md:text-base flex items-center justify-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -198,7 +198,7 @@ $logout = function (Logout $logout) {
                     </button>
                 </div>
             @empty
-                <p class="text-sm md:text-base text-gray-500">下の「全カード」から「✅ 予定に追加」ボタンを押して、今日の予定を追加してください。</p>
+                <p class="text-base md:text-lg text-gray-500">下の「全カード」から「✅ 予定に追加」ボタンを押して、今日の予定を追加してください。</p>
             @endforelse
         </div>
     </div>
@@ -222,7 +222,7 @@ $logout = function (Logout $logout) {
                     <input type="text" wire:model="editingPlaceName"
                         class="w-full p-2 border border-gray-300 rounded mb-2 text-sm">
                     @error('editingPlaceName')
-                        <span class="text-red-500 text-xs block mb-2">{{ $message }}</span>
+                        <span class="text-red-500 text-sm block mb-2">{{ $message }}</span>
                     @enderror
                     <button wire:click="update" wire:loading.attr="disabled" wire:target="update"
                         class="w-full px-2 py-1 bg-blue-500 text-white rounded text-xs mb-1 disabled:opacity-50">

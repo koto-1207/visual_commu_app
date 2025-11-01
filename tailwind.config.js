@@ -18,6 +18,8 @@ export default {
                 'pic-bg': '#f2faf9',      // 背景色（ロゴのピンクを薄くした色）
                 'pic-mint': '#a2d9ce',    // ミントグリーン（ロゴの色）
                 'pic-pink': '#f7b2b7',    // ピンク（ロゴの色）
+                'pic-mint-dark': '#5eb89f',    // ミントグリーン（濃いめ）
+                'pic-pink-dark': '#e8868d',    // ピンク（濃いめ）
             },
             borderRadius: {
                 'card': '1.5rem',

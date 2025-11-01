@@ -83,7 +83,7 @@ $nextPlace = computed(function () {
 
     {{-- ヘッダー --}}
     <div class="w-full max-w-lg mb-4 flex justify-between items-center pb-4 border-b border-gray-200">
-        <h1 class="text-3xl md:text-4xl font-bold text-gray-700">カードをえらぶ</h1>
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-700 flex-1 text-center">カードをえらぶ</h1>
         <a href="/places" wire:navigate
             class="inline-block px-2 py-1 bg-gray-400 text-white rounded text-xs hover:bg-gray-500 transition duration-150 opacity-75 hover:opacity-100">
             メニュー
@@ -128,7 +128,7 @@ $nextPlace = computed(function () {
 
 
                     <img src="{{ asset('storage/' . $this->currentPlace->image_path) }}"
-                        alt="{{ $this->currentPlace->name }}" class="card-image h-65 md:h-70"
+                        alt="{{ $this->currentPlace->name }}" class="w-full h-64 object-cover"
                         onerror="this.src='{{ asset('storage/places/placeholder.png') }}'; this.onerror=null;">
 
                     @if ($selectedPlaceId === $this->currentPlace->id)
@@ -140,10 +140,10 @@ $nextPlace = computed(function () {
             </div>
         @else
             <h1 class="text-3xl md:text-4xl font-bold text-gray-700 mb-6">カードがありません</h1>
-            <p class="text-xl text-gray-500 mb-6">まず管理画面からカードを登録してください。</p>
+            <p class="text-xl text-gray-500 mb-6">まず管理メニューからカードを登録してください。</p>
             <a href="/places" wire:navigate
                 class="inline-block px-8 py-4 bg-blue-500 text-white rounded-2xl text-xl font-bold hover:bg-blue-600 transition shadow-lg">
-                管理画面へ
+                管理メニューへ
             </a>
         @endif
     </div>
@@ -192,7 +192,7 @@ $nextPlace = computed(function () {
                 if (horizontalDist < -swipeThreshold) @this.call('next');
                 if (horizontalDist > swipeThreshold) @this.call('prev');
             }
- 
+
 
 
 
