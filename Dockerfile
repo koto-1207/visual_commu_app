@@ -12,6 +12,7 @@ RUN apk add --update nodejs-lts npm
 ENV WEBROOT /var/www/html/public
 ENV PHP_ERRORS_STDERR 1
 ENV REAL_IP_HEADER 1
+ENV SKIP_COMPOSER 1
 
 # Laravel config
 ENV APP_ENV production
