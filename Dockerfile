@@ -49,4 +49,8 @@ RUN mkdir -p /var/www/html/storage/framework/{sessions,views,cache} \
     && chown -R nginx:nginx /var/www/html/storage \
     && chown -R nginx:nginx /var/www/html/bootstrap/cache
 
-CMD ["/start.sh"]
+# Make startup script executable
+RUN chmod +x /var/www/html/scripts/startup.sh
+
+# Use custom startup script that runs Laravel initialization before starting services
+CMD ["/var/www/html/scripts/startup.sh"]
