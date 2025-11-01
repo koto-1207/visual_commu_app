@@ -41,11 +41,10 @@ composer dump-autoload --optimize --no-dev || true
 echo "Caching configuration..."
 php artisan config:cache
 
-echo "NOTE: Skipping route:cache because it may conflict with Volt dynamic components"
-echo "NOTE: Skipping view:cache because it conflicts with Volt dynamic components"
+echo "Caching routes..."
+php artisan route:cache || echo "Route caching failed"
 
-echo "Testing if routes can be loaded without cache..."
-php artisan route:list --path=login 2>&1 | head -n 20 || echo "Could not load login route"
+echo "NOTE: Skipping view:cache because it conflicts with Volt dynamic components"
 
 echo "Verifying Volt can find views..."
 test -d /var/www/html/resources/views/livewire/pages/auth && echo "✅ Auth views directory exists" || echo "❌ Auth views directory missing"
@@ -89,6 +88,20 @@ test -d /var/www/html/resources/views/livewire && echo "✅ Livewire directory e
 
 echo "Testing if Volt can resolve pages.auth.login component..."
 php artisan tinker --execute="echo Livewire\Volt\Volt::class;" 2>&1 || echo "Volt class not available"
+
+echo "Testing Volt::render() directly..."
+php -r "
+require '/var/www/html/vendor/autoload.php';
+\$app = require_once '/var/www/html/bootstrap/app.php';
+\$app->boot();
+try {
+    \$result = Livewire\Volt\Volt::render('pages.auth.login');
+    echo 'SUCCESS: Volt::render() returned: ' . get_class(\$result) . PHP_EOL;
+} catch (\Exception \$e) {
+    echo 'ERROR: ' . \$e->getMessage() . PHP_EOL;
+    echo 'File: ' . \$e->getFile() . ':' . \$e->getLine() . PHP_EOL;
+}
+" 2>&1 || echo "Could not test Volt::render()"
 
 echo "Checking Laravel storage/logs for errors..."
 if [ -f /var/www/html/storage/logs/laravel.log ]; then
