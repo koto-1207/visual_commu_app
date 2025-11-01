@@ -41,10 +41,11 @@ composer dump-autoload --optimize --no-dev || true
 echo "Caching configuration..."
 php artisan config:cache
 
-echo "Caching routes..."
-php artisan route:cache
-
+echo "NOTE: Skipping route:cache because it may conflict with Volt dynamic components"
 echo "NOTE: Skipping view:cache because it conflicts with Volt dynamic components"
+
+echo "Testing if routes can be loaded without cache..."
+php artisan route:list --path=login 2>&1 | head -n 20 || echo "Could not load login route"
 
 echo "Verifying Volt can find views..."
 test -d /var/www/html/resources/views/livewire/pages/auth && echo "✅ Auth views directory exists" || echo "❌ Auth views directory missing"
