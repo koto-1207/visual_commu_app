@@ -5,18 +5,18 @@ use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
 Route::middleware('guest')->group(function () {
-    Route::get('register', fn() => Volt::render('pages.auth.register'))->name('register');
-    Route::get('login', \App\Livewire\Auth\Login::class)->name('login');
-    Route::get('forgot-password', fn() => Volt::render('pages.auth.forgot-password'))->name('password.request');
-    Route::get('reset-password/{token}', fn($token) => Volt::render('pages.auth.reset-password', ['token' => $token]))->name('password.reset');
+    Volt::route('register', 'pages.auth.register')->name('register');
+    Volt::route('login', 'pages.auth.login')->name('login');
+    Volt::route('forgot-password', 'pages.auth.forgot-password')->name('password.request');
+    Volt::route('reset-password/{token}', 'pages.auth.reset-password')->name('password.reset');
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('verify-email', fn() => Volt::render('pages.auth.verify-email'))->name('verification.notice');
+    Volt::route('verify-email', 'pages.auth.verify-email')->name('verification.notice');
 
     Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
         ->middleware(['signed', 'throttle:6,1'])
         ->name('verification.verify');
 
-    Route::get('confirm-password', fn() => Volt::render('pages.auth.confirm-password'))->name('password.confirm');
+    Volt::route('confirm-password', 'pages.auth.confirm-password')->name('password.confirm');
 });

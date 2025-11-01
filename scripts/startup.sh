@@ -42,17 +42,7 @@ echo "Caching configuration..."
 php artisan config:cache
 
 echo "Caching routes..."
-php artisan route:cache || echo "Route caching failed"
-
-echo "NOTE: Skipping view:cache because it conflicts with Volt dynamic components"
-
-echo "Verifying Volt can find views..."
-test -d /var/www/html/resources/views/livewire/pages/auth && echo "✅ Auth views directory exists" || echo "❌ Auth views directory missing"
-echo "Checking specific view files..."
-test -f /var/www/html/resources/views/livewire/pages/auth/login.blade.php && echo "✅ login.blade.php exists" || echo "❌ login.blade.php missing"
-test -f /var/www/html/resources/views/livewire/pages/auth/register.blade.php && echo "✅ register.blade.php exists" || echo "❌ register.blade.php missing"
-echo "Listing auth directory contents..."
-ls -la /var/www/html/resources/views/livewire/pages/auth/ || echo "Cannot list directory"
+php artisan route:cache
 
 echo "Running migrations..."
 php artisan migrate --force --isolated 2>&1 || echo "⚠️ Migrations skipped"
@@ -60,46 +50,6 @@ php artisan migrate --force --isolated 2>&1 || echo "⚠️ Migrations skipped"
 echo "Setting up storage and assets..."
 php artisan storage:link 2>&1 || true
 php artisan livewire:publish --assets 2>&1 || true
-
-echo "✅ Laravel pre-initialization complete"
-
-# Verify route cache
-echo "Verifying route cache..."
-if [ -f /var/www/html/bootstrap/cache/routes-v7.php ]; then
-    echo "✅ Route cache file exists"
-else
-    echo "❌ WARNING: Route cache file NOT created!"
-fi
-
-echo "Listing all routes..."
-php artisan route:list || echo "Could not list routes"
-
-echo "Testing login route with artisan..."
-php artisan route:list --name=login --json || true
-
-echo "Verifying auth.php is accessible..."
-test -f /var/www/html/routes/auth.php && echo "✅ auth.php exists" || echo "❌ auth.php missing"
-echo "Checking routes directory..."
-ls -la /var/www/html/routes/ || echo "Cannot list routes directory"
-
-echo "Verifying Volt mount path..."
-php -r "echo 'Resolved path: ' . realpath(__DIR__ . '/../app/Providers/../../resources/views/livewire') . PHP_EOL;" || true
-test -d /var/www/html/resources/views/livewire && echo "✅ Livewire directory exists" || echo "❌ Livewire directory missing"
-
-echo "Testing if Volt can resolve pages.auth.login component..."
-php artisan tinker --execute="echo Livewire\Volt\Volt::class;" 2>&1 || echo "Volt class not available"
-
-echo "Testing Login component class..."
-test -f /var/www/html/app/Livewire/Auth/Login.php && echo "✅ Login component exists" || echo "❌ Login component missing"
-test -f /var/www/html/resources/views/livewire/auth/login.blade.php && echo "✅ Login view exists" || echo "❌ Login view missing"
-
-echo "Checking Laravel storage/logs for errors..."
-if [ -f /var/www/html/storage/logs/laravel.log ]; then
-    echo "Recent Laravel errors:"
-    tail -n 20 /var/www/html/storage/logs/laravel.log || true
-else
-    echo "No laravel.log file found yet"
-fi
 
 echo "✅ Application fully ready"
 
