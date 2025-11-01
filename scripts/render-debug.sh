@@ -32,7 +32,7 @@ php artisan migrate:status || echo "Migration check failed"
 echo ""
 
 echo "7. Route List (first 20):"
-php artisan route:list --compact | head -n 20 || echo "Route list failed"
+php artisan route:list | head -n 20 || echo "Route list failed"
 echo ""
 
 echo "8. Config Cache Status:"
