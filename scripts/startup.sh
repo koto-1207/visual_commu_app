@@ -40,15 +40,8 @@ php artisan storage:link 2>&1 || true
 php artisan livewire:publish --assets 2>&1 || true
 
 echo "✅ Laravel initialized successfully"
+echo "Starting web services..."
 
-# Start supervisord in the background
-/start.sh &
-
-# Wait for services to be ready
-sleep 3
-
-echo "✅ Services started - Application ready"
-
-# Keep container running
-wait
+# Start supervisord (this will keep the container running)
+exec /start.sh
 
