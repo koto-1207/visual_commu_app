@@ -18,17 +18,26 @@ mkdir -p /var/www/html/storage/framework/{sessions,views,cache}
 mkdir -p /var/www/html/storage/logs
 mkdir -p /var/www/html/storage/app/public
 
-# Clear and cache (suppress verbose output)
-php artisan config:cache > /dev/null 2>&1
-php artisan route:cache > /dev/null 2>&1
-php artisan view:cache > /dev/null 2>&1
+echo "Clearing caches..."
+# Clear all caches first
+php artisan cache:clear 2>&1 || true
+php artisan config:clear 2>&1 || true
+php artisan route:clear 2>&1 || true
+php artisan view:clear 2>&1 || true
 
-# Run migrations silently
-php artisan migrate --force --isolated > /dev/null 2>&1 || true
+echo "Caching configuration and routes..."
+# Cache config and routes (show errors if any)
+php artisan config:cache 2>&1
+php artisan route:cache 2>&1
 
+echo "Running migrations..."
+# Run migrations
+php artisan migrate --force --isolated 2>&1 || echo "⚠️ Migrations skipped"
+
+echo "Setting up storage and assets..."
 # Storage link and Livewire assets
-php artisan storage:link > /dev/null 2>&1 || true
-php artisan livewire:publish --assets > /dev/null 2>&1 || true
+php artisan storage:link 2>&1 || true
+php artisan livewire:publish --assets 2>&1 || true
 
 echo "✅ Laravel initialized successfully"
 
@@ -36,7 +45,7 @@ echo "✅ Laravel initialized successfully"
 /start.sh &
 
 # Wait for services to be ready
-sleep 2
+sleep 3
 
 echo "✅ Services started - Application ready"
 
