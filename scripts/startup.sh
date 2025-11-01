@@ -78,6 +78,13 @@ php artisan route:list || echo "Could not list routes"
 echo "Testing login route with artisan..."
 php artisan route:list --name=login --json || true
 
+echo "Verifying Volt mount path..."
+php -r "echo 'Resolved path: ' . realpath(__DIR__ . '/../app/Providers/../../resources/views/livewire') . PHP_EOL;" || true
+test -d /var/www/html/resources/views/livewire && echo "✅ Livewire directory exists" || echo "❌ Livewire directory missing"
+
+echo "Testing if PHP can load the application..."
+php -r "require '/var/www/html/vendor/autoload.php'; echo 'Autoload OK' . PHP_EOL;" || echo "Autoload failed"
+
 echo "Checking Laravel storage/logs for errors..."
 if [ -f /var/www/html/storage/logs/laravel.log ]; then
     echo "Recent Laravel errors:"
