@@ -47,7 +47,6 @@ $sendVerification = function () {
 };
 
 ?>
-
 <section>
     <header class="border-b border-pic-mint pb-3 mb-6">
         <h2 class="text-xl font-bold text-gray-800">
