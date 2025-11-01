@@ -1,0 +1,46 @@
+services:
+  # Web Service
+  - type: web
+    name: visual-commu-app
+    env: docker
+    region: oregon # お好みのリージョンに変更可能
+    plan: free # または starter, standard など
+    branch: main # または master
+    healthCheckPath: /up
+    envVars:
+      - key: APP_NAME
+        value: Visual Commu App
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: LOG_LEVEL
+        value: error
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: DB_CONNECTION
+        value: mysql
+      # 以下の環境変数は Render のダッシュボードで設定してください（セキュリティのため）
+      # - APP_KEY (必須)
+      # - APP_URL (例: https://your-app-name.onrender.com)
+      # - DB_HOST
+      # - DB_PORT
+      # - DB_DATABASE
+      # - DB_USERNAME
+      # - DB_PASSWORD
+
+  # Database (オプション: 既存のデータベースを使用する場合は不要)
+  # - type: pserv
+  #   name: visual-commu-db
+  #   env: docker
+  #   plan: free
+  #   databases:
+  #     - name: visual_commu_app
+  #       user: visual_commu_user
+
