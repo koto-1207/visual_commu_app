@@ -18,4 +18,14 @@ ENV LOG_CHANNEL stderr
 # Allow composer to run as root
 ENV COMPOSER_ALLOW_SUPERUSER 1
 
+# Set proper permissions for Laravel storage and bootstrap cache
+RUN mkdir -p /var/www/html/storage/framework/{sessions,views,cache} \
+    && mkdir -p /var/www/html/storage/logs \
+    && mkdir -p /var/www/html/storage/app/public \
+    && mkdir -p /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/storage \
+    && chmod -R 775 /var/www/html/bootstrap/cache \
+    && chown -R nginx:nginx /var/www/html/storage \
+    && chown -R nginx:nginx /var/www/html/bootstrap/cache
+
 CMD ["/start.sh"]

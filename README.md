@@ -1,11 +1,68 @@
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# Visual Communication App
+
+視覚的コミュニケーションを支援するLaravelアプリケーションです。
+
+## 機能
+
+- 場所の登録・管理（画像付き）
+- スケジュール管理
+- ドラッグ&ドロップでの並び替え
+- Livewire/Voltによるリアクティブなインターフェース
+
+## ローカル開発環境
+
+### 必要なもの
+
+- PHP 8.2以上
+- Composer
+- Node.js & npm
+- MySQL/MariaDB または SQLite
+
+### セットアップ
+
+```bash
+# リポジトリをクローン
+git clone <repository-url>
+cd visual_commu_app
+
+# 依存関係のインストールとセットアップ
+composer run setup
+
+# 開発サーバーの起動
+composer run dev
+```
+
+ブラウザで `http://localhost:8000` にアクセスしてください。
+
+## Renderへのデプロイ
+
+詳細なデプロイ手順は [RENDER_SETUP.md](RENDER_SETUP.md) を参照してください。
+
+### 簡単な手順
+
+1. Renderで新しいWeb Serviceを作成（Docker環境）
+2. 環境変数を設定（特に`APP_KEY`は必須）
+3. データベースを作成して接続情報を設定
+4. デプロイ
+
+## トラブルシューティング
+
+500エラーが発生する場合は、以下を確認してください：
+
+1. 環境変数`APP_KEY`が設定されているか
+2. データベース接続情報が正しいか
+3. ストレージディレクトリの権限が適切か
+4. Renderのログで詳細なエラーを確認
+
+詳細は [RENDER_SETUP.md](RENDER_SETUP.md) の「トラブルシューティング」セクションを参照してください。
+
+## ライセンス
+
+MIT License
+
+---
 
 ## About Laravel
 

@@ -1,6 +1,31 @@
 #!/usr/bin/env bash
-echo "Running composer"
-composer install --no-dev --working-dir=/var/www/html
+set -e
+
+echo "===== Starting deployment ====="
+
+# Check if APP_KEY is set
+if [ -z "$APP_KEY" ]; then
+    echo "ERROR: APP_KEY is not set!"
+    exit 1
+fi
+
+echo "Running composer install..."
+composer install --no-dev --working-dir=/var/www/html --optimize-autoloader --no-interaction
+
+echo "Setting storage permissions..."
+chmod -R 775 /var/www/html/storage || true
+chmod -R 775 /var/www/html/bootstrap/cache || true
+
+# Ensure storage directories exist
+mkdir -p /var/www/html/storage/framework/{sessions,views,cache}
+mkdir -p /var/www/html/storage/logs
+mkdir -p /var/www/html/storage/app/public
+
+echo "Clearing all caches..."
+php artisan cache:clear || true
+php artisan config:clear || true
+php artisan route:clear || true
+php artisan view:clear || true
 
 echo "Caching config..."
 php artisan config:cache
@@ -11,5 +36,13 @@ php artisan route:cache
 echo "Running migrations..."
 php artisan migrate --force
 
+echo "Creating storage link..."
+php artisan storage:link || true
+
 echo "Publishing Livewire assets..."
 php artisan livewire:publish --assets
+
+echo "Optimizing..."
+php artisan optimize
+
+echo "===== Deployment finished successfully ====="

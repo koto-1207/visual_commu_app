@@ -1,0 +1,11 @@
+# Renderでビルドする際に無視するファイル
+/tests
+/storage/logs/*.log
+/storage/debugbar
+/node_modules
+.phpunit.result.cache
+.env.example
+*.md
+!README.md
+!RENDER_SETUP.md
+
