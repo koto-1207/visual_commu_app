@@ -74,6 +74,17 @@ fi
 echo "Listing all routes..."
 php artisan route:list || echo "Could not list routes"
 
+echo "Testing login route with artisan..."
+php artisan route:list --name=login --json || true
+
+echo "Checking Laravel storage/logs for errors..."
+if [ -f /var/www/html/storage/logs/laravel.log ]; then
+    echo "Recent Laravel errors:"
+    tail -n 20 /var/www/html/storage/logs/laravel.log || true
+else
+    echo "No laravel.log file found yet"
+fi
+
 echo "✅ Application fully ready"
 
 echo "Starting web services..."

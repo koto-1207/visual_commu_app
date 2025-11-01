@@ -31,7 +31,7 @@ $save = function () {
     <div class="mb-5 flex justify-between items-center">
         <h2 class="text-2xl font-bold text-gray-700">新しい場所を登録</h2>
         <a href="/places" wire:navigate class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
-            一覧に戻る
+            メニューに戻る
         </a>
     </div>
 
