@@ -12,7 +12,11 @@ class VoltServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Mount Volt in register() to ensure it's available before routes are loaded
+        // Use absolute path to avoid issues with resource_path() timing
+        Volt::mount([
+            base_path('resources/views/livewire'),
+        ]);
     }
 
     /**
@@ -20,7 +24,6 @@ class VoltServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Volt is now mounted in AppServiceProvider::register()
-        // to ensure it's available before routes are loaded
+        //
     }
 }
