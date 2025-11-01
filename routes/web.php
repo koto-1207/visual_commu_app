@@ -3,7 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
-require __DIR__ . '/auth.php';
+Volt::route('/', 'welcome')->name('welcome');
+Volt::route('/schedule', 'schedule.index')->name('schedule');
+Volt::route('/choice', 'choice.index')->name('choice');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::redirect('/dashboard', '/places')->name('dashboard');
@@ -12,6 +14,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Volt::route('/places/create', 'places.create')->name('places.create');
 });
 
-Volt::route('/schedule', 'schedule.index')->name('schedule');
-Volt::route('/choice', 'choice.index')->name('choice');
-Volt::route('/', 'welcome')->name('welcome');
+require __DIR__ . '/auth.php';
