@@ -25,6 +25,13 @@ php artisan config:clear || true
 php artisan route:clear || true
 php artisan view:clear || true
 
+# Also manually delete cache files to ensure clean slate
+echo "Removing old cache files..."
+rm -f /var/www/html/bootstrap/cache/routes-v7.php || true
+rm -f /var/www/html/bootstrap/cache/config.php || true
+rm -rf /var/www/html/storage/framework/cache/* || true
+rm -rf /var/www/html/storage/framework/views/* || true
+
 echo "Caching configuration..."
 # Cache config
 php artisan config:cache
