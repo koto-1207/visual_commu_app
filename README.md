@@ -13,12 +13,12 @@
 
 ## ローカル開発環境
 
+このプロジェクトは **Laravel Sail** を使用しています。
+
 ### 必要なもの
 
-- PHP 8.2以上
-- Composer
-- Node.js & npm
-- MySQL/MariaDB または SQLite
+- Docker Desktop
+- Git
 
 ### セットアップ
 
@@ -27,25 +27,67 @@
 git clone <repository-url>
 cd visual_commu_app
 
-# 依存関係のインストールとセットアップ
-composer run setup
+# Sailコンテナを起動
+./vendor/bin/sail up -d
 
-# 開発サーバーの起動
-composer run dev
+# マイグレーションを実行
+./vendor/bin/sail artisan migrate
+
+# フロントエンドをビルド
+./vendor/bin/sail npm install
+./vendor/bin/sail npm run build
 ```
 
-ブラウザで `http://localhost:8000` にアクセスしてください。
+ブラウザで `http://localhost` にアクセスしてください。
+
+### よく使うコマンド
+
+```bash
+# コンテナを起動
+./vendor/bin/sail up -d
+
+# コンテナを停止
+./vendor/bin/sail down
+
+# Artisanコマンドを実行
+./vendor/bin/sail artisan <command>
+
+# Composerコマンドを実行
+./vendor/bin/sail composer <command>
+
+# NPMコマンドを実行
+./vendor/bin/sail npm <command>
+```
+
+詳細は [SAIL_COMMANDS.md](SAIL_COMMANDS.md) を参照してください。
 
 ## Renderへのデプロイ
 
-詳細なデプロイ手順は [RENDER_SETUP.md](RENDER_SETUP.md) を参照してください。
+### クイックスタート
+
+デプロイ前のチェックリスト: [DEPLOY_CHECKLIST.md](DEPLOY_CHECKLIST.md)  
+詳細なデプロイ手順: [RENDER_SETUP.md](RENDER_SETUP.md)
 
 ### 簡単な手順
 
-1. Renderで新しいWeb Serviceを作成（Docker環境）
-2. 環境変数を設定（特に`APP_KEY`は必須）
-3. データベースを作成して接続情報を設定
-4. デプロイ
+1. **APP_KEYを生成**
+   ```bash
+   ./vendor/bin/sail artisan key:generate --show
+   ```
+
+2. **Renderで新しいWeb Serviceを作成**（Docker環境）
+
+3. **環境変数を設定**（必須）
+   - `APP_KEY` - 上記で生成した値
+   - `APP_URL` - RenderのURL
+   - データベース接続情報
+
+4. **デプロイ**
+   ```bash
+   git add .
+   git commit -m "Deploy to Render"
+   git push
+   ```
 
 ## トラブルシューティング
 

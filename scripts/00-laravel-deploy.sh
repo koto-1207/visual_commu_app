@@ -12,6 +12,12 @@ fi
 echo "Running composer install..."
 composer install --no-dev --working-dir=/var/www/html --optimize-autoloader --no-interaction
 
+echo "Installing npm dependencies..."
+npm ci --prefix /var/www/html
+
+echo "Building frontend assets..."
+npm run build --prefix /var/www/html
+
 echo "Setting storage permissions..."
 chmod -R 775 /var/www/html/storage || true
 chmod -R 775 /var/www/html/bootstrap/cache || true
@@ -34,7 +40,10 @@ echo "Caching routes..."
 php artisan route:cache
 
 echo "Running migrations..."
-php artisan migrate --force
+php artisan migrate --force --isolated
+
+echo "Checking migrations status..."
+php artisan migrate:status || true
 
 echo "Creating storage link..."
 php artisan storage:link || true
